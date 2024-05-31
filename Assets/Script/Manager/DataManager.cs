@@ -39,7 +39,7 @@ public class DataManager : MonoBehaviour
     void Awake()
     {
         path = Application.persistentDataPath + "/";
-        Debug.Log(path);
+        //Debug.Log(path);
         LoadData();
     }
 

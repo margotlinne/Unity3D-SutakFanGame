@@ -86,7 +86,7 @@ public class Player : MonoBehaviour
             arrivedDestination();
         }
 
-        // 클릭한 대화 상대에게 도착했을 때
+        // 클릭한 대화 상대에게 도착했을 때 ---- 대화상대 클릭 후 다시 경로 바꾸지 못함 이거 해결해야 함
         if (convoManager.clickToTalk && (agent.remainingDistance <= 5f && agent.remainingDistance > 0))
         {
             Debug.Log("arrived" + agent.remainingDistance);
@@ -217,5 +217,7 @@ public class Player : MonoBehaviour
             arrivedDestination();
             battleManager.inBattle = true;
         }
+
+        
     }
 }

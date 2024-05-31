@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a275346d65d8984baa98106e3b2bdcc, type: 3}
+  m_Name: ThickWhiteFlower
+  m_EditorClassIdentifier: 
+  id: 102
+  itemName: "\uB2E8\uB2E8\uD55C \uD558\uC580 \uAF43"
+  description: "\uB2E8\uB2E8\uD55C \uC904\uAE30 \uC704\uB85C \uC790\uB780 \uC5F0\uC57D\uD55C
+    \uBE5B\uB098\uB294 \uD558\uC580 \uAF43. \uB2E8\uB2E8\uD55C \uBAB8\uC9D1\uC5D0
+    \uC790\uB780 \uAC74 \uC5F0\uC57D\uD55C \uAF43\uC774\uB77C\uB2C8, \uBC18\uC804
+    \uC788\uB294 \uB140\uC11D\uC774\uB2E4."
+  type: 5
+  icon: {fileID: 1428299814, guid: d2983e432be74c6489f40df96c8247dd, type: 3}
+  consumable: 0
+  craftable: 1
+  stackable: 1

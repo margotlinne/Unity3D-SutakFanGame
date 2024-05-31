@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a275346d65d8984baa98106e3b2bdcc, type: 3}
+  m_Name: StrengthPotion
+  m_EditorClassIdentifier: 
+  id: 204
+  itemName: "\uD798\uC758 \uBB3C\uC57D"
+  description: "\uBCD1 \uC548\uC5D0\uC11C \uC545\uD55C \uC601\uC758 \uC794\uD574\uB4E4\uC774
+    \uB098\uAC00\uB824\uACE0 \uC720\uB9AC\uBCD1\uC744 \uB450\uB4DC\uB9AC\uB294 \uC18C\uB9AC\uAC00
+    \uB4E4\uB9AC\uB294 \uAC83\uB9CC \uAC19\uB2E4. \uC774 \uBB3C\uC57D\uC744 \uB9C8\uC2DC\uBA74
+    \uC5B4\uB290\uC815\uB3C4 \uD798\uC744 \uC904 \uAC83\uC774\uB2E4."
+  type: 1
+  icon: {fileID: -1203036936, guid: d2983e432be74c6489f40df96c8247dd, type: 3}
+  consumable: 1
+  craftable: 0
+  stackable: 1

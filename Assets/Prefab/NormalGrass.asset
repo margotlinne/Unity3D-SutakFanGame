@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2a275346d65d8984baa98106e3b2bdcc, type: 3}
+  m_Name: NormalGrass
+  m_EditorClassIdentifier: 
+  id: 111
+  itemName: "\uD3C9\uBC94\uD55C \uC7A1\uCD08"
+  description: "\uBCF4\uB3C4\uBE14\uB7ED \uC0AC\uC774\uC5D0 \uC790\uB77C \uC788\uC744
+    \uAC83\uB9CC \uAC19\uC740 \uBB34\uB09C\uD558\uACE0\uB3C4 \uD3C9\uBC94\uD558\uAE30
+    \uC9DD\uC774 \uC5C6\uB294 \uC7A1\uCD08. \uD558\uC9C0\uB9CC \uC88B\uC740 \uBB3C\uC57D
+    \uC7AC\uB8CC\uAC00 \uB420 \uAC83\uC774\uB2E4."
+  type: 5
+  icon: {fileID: -78175526, guid: d2983e432be74c6489f40df96c8247dd, type: 3}
+  consumable: 0
+  craftable: 1
+  stackable: 1

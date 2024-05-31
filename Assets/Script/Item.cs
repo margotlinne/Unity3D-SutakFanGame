@@ -2,13 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[CreateAssetMenu(fileName = "New Item", menuName = "Item/Create")]
-public class Item : ScriptableObject
+public class Item : MonoBehaviour
 {
-    public int id;
-    public string itemName;
-    public int value;
-    public Sprite icon;
-    public bool consumable;
-    public bool craftable;
+    GameManager gameManager;
+    public InventoryItem inventoryItem;
+
+    void Start()
+    {
+        gameManager = GameManager.instance;
+    }
+
+    void OnMouseDown()
+    {
+        bool delete = false;
+        delete = gameManager.inventoryManager.AddItem(inventoryItem);
+        //if (delete) { Destroy(this.gameObject); } 
+    }
 }
