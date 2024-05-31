@@ -4,37 +4,17 @@ using UnityEngine;
 using System.IO;
 using JetBrains.Annotations;
 
-public class PlayerData
-{
-    public int stat_initiative;
-    public int stat_strength;
-    public int stat_evasion;
-    public int stat_luck;
-    public int stat_bargain;
-
-    public int availablePoints;
-
-    public float current_health;
-    public float maximum_health;
-
-    public Vector3 current_position;
-}
-
-public class MapData
-{
-    public bool[] foundWayPoint;
-    // ∏  π‡»˘ ∫Œ∫– ºŒ¿Ã¥ı?
-}
-
 
 public class DataManager : MonoBehaviour
 {
     public PlayerData playerData = new PlayerData();
     public MapData mapData = new MapData();
+    public InventoryData inventoryData = new InventoryData(40);
 
     string path;
     string player_filename = "player_data";
     string map_filename = "map_data";
+    string inventory_filename = "inventory_data";
 
     void Awake()
     {
@@ -51,6 +31,7 @@ public class DataManager : MonoBehaviour
             SaveData();
             Debug.Log("saved game");
         }
+      
     }
 
     public void SaveData()
@@ -60,6 +41,9 @@ public class DataManager : MonoBehaviour
 
         string data_map = JsonUtility.ToJson(mapData);
         File.WriteAllText(path + map_filename, data_map);
+
+        string data_inventory = JsonUtility.ToJson(inventoryData);
+        File.WriteAllText(path + inventory_filename, data_inventory);
     }
     public void LoadData()
     {
@@ -74,7 +58,13 @@ public class DataManager : MonoBehaviour
             string data_map = File.ReadAllText(path + map_filename);
             mapData = JsonUtility.FromJson<MapData>(data_map);
         }
-            
+
+        if (File.Exists(path + inventory_filename))
+        {
+            string data_inventory = File.ReadAllText(path + inventory_filename);
+            inventoryData = JsonUtility.FromJson<InventoryData>(data_inventory);
+        }
+
     }
 
 

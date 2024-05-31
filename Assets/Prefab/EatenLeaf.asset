@@ -18,7 +18,7 @@ MonoBehaviour:
     \uBD80\uBD84\uC740 \uBCF4\uB77C\uC0C9 \uBC18\uC9DD\uC774\uB294 \uC810\uC561\uC774
     \uB048\uC801\uAC70\uB9B0\uB2E4. "
   type: 5
-  icon: {fileID: -1516388647, guid: d2983e432be74c6489f40df96c8247dd, type: 3}
+  icon: {fileID: 21300000, guid: 8f39737ae01d2ce4eabe9382b678f413, type: 3}
   consumable: 0
   craftable: 1
   stackable: 1

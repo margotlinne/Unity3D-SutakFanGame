@@ -23,6 +23,10 @@ public class UIManager : MonoBehaviour
 
     GameManager gameManager;
     public bool isCanvasOn = false;
+    public int currentlyOpenUI;
+
+
+    public List<GameObject> activeUI = new List<GameObject>();
 
 
     void Start()
@@ -42,18 +46,29 @@ public class UIManager : MonoBehaviour
     }
 
     void Update()
-    {
+    {        
+        if (activeUI.Count > 0)
+        {
+            currentlyOpenUI = activeUI.Count - 1;
+            if (Input.GetKeyDown(KeyCode.Escape))
+            {
+                activeUI[currentlyOpenUI].SetActive(false);
+                activeUI.Remove(activeUI[currentlyOpenUI]);
+            }
+        }
+
+
         if (Input.GetKeyDown(KeyCode.I))
         {
             if (!inventoryCanvas.activeSelf && !isCanvasOn)
             {
                 inventoryCanvas.SetActive(true);
-                isCanvasOn = true;
+                activeUI.Add(inventoryCanvas);
             }
             else
             {
                 inventoryCanvas.SetActive(false);
-                isCanvasOn = false;
+                activeUI.Remove(inventoryCanvas);
             }
         }
 
@@ -62,12 +77,12 @@ public class UIManager : MonoBehaviour
             if (!mapCanvas.activeSelf && !isCanvasOn)
             {
                 mapCanvas.SetActive(true);
-                isCanvasOn = true;
+                activeUI.Add(mapCanvas);
             }
             else
             {
                 mapCanvas.SetActive(false);
-                isCanvasOn = false;
+                activeUI.Remove(mapCanvas);
             }
         }
 
@@ -77,6 +92,12 @@ public class UIManager : MonoBehaviour
         {
             UpdateStats();
         }
+
+        if (inventoryCanvas.activeSelf || mapCanvas.activeSelf)
+        {
+            isCanvasOn = true;
+        }
+        else { isCanvasOn = false; }
     }
 
     void OnIncreaseButtonClick(int index)

@@ -19,7 +19,7 @@ MonoBehaviour:
     \uC790\uB780 \uAC74 \uC5F0\uC57D\uD55C \uAF43\uC774\uB77C\uB2C8, \uBC18\uC804
     \uC788\uB294 \uB140\uC11D\uC774\uB2E4."
   type: 5
-  icon: {fileID: 1428299814, guid: d2983e432be74c6489f40df96c8247dd, type: 3}
+  icon: {fileID: 21300000, guid: cb38d5723b7d7804981ae72b1d9015df, type: 3}
   consumable: 0
   craftable: 1
   stackable: 1

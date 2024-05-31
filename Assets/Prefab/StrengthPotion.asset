@@ -19,7 +19,7 @@ MonoBehaviour:
     \uB4E4\uB9AC\uB294 \uAC83\uB9CC \uAC19\uB2E4. \uC774 \uBB3C\uC57D\uC744 \uB9C8\uC2DC\uBA74
     \uC5B4\uB290\uC815\uB3C4 \uD798\uC744 \uC904 \uAC83\uC774\uB2E4."
   type: 1
-  icon: {fileID: -1203036936, guid: d2983e432be74c6489f40df96c8247dd, type: 3}
+  icon: {fileID: 21300000, guid: b2282880f0bbf264184bf64379472760, type: 3}
   consumable: 1
   craftable: 0
   stackable: 1

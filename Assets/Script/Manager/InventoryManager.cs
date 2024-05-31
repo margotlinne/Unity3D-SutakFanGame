@@ -1,9 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEditor;
+using UnityEngine.EventSystems;
 using TMPro;
-
-
 
 public class InventoryManager : MonoBehaviour
 {
@@ -30,6 +30,10 @@ public class InventoryManager : MonoBehaviour
     public bool windowOn = false;
 
 
+    [HideInInspector]
+    public int hoverId = 0;
+
+    GameManager gameManager;
 
     void Start()
     {
@@ -43,6 +47,29 @@ public class InventoryManager : MonoBehaviour
         {
             itemDictionary[item.id] = item;
         }
+
+        gameManager = GameManager.instance;
+        for (int i = 0; i < slots.Length; i++) 
+        {
+            slots[i].id = gameManager.dataManager.inventoryData.itemID[i];
+            slots[i].itemInSlot.sprite = Resources.Load<Sprite>(gameManager.dataManager.inventoryData.imagePath[i]);
+            slots[i].isEmpty = gameManager.dataManager.inventoryData.emptySlot[i];
+            slots[i].amount = gameManager.dataManager.inventoryData.itemAmount[i];
+           // Debug.Log(gameManager.dataManager.inventoryData.imagePath[i]);
+        }
+
+    }
+
+    void setDataValues(int i)
+    {
+        gameManager.dataManager.inventoryData.itemID[i] = slots[i].id;
+
+        string path = AssetDatabase.GetAssetPath(slots[i].itemInSlot.sprite);
+        path = path.Replace("Assets/Resources/", "").Replace(".png", "");
+        gameManager.dataManager.inventoryData.imagePath[i] = path;
+
+        gameManager.dataManager.inventoryData.emptySlot[i] = slots[i].isEmpty;
+        gameManager.dataManager.inventoryData.itemAmount[i] = slots[i].amount;
     }
 
     public bool AddItem(InventoryItem inventoryItem)
@@ -57,6 +84,7 @@ public class InventoryManager : MonoBehaviour
             {
                 slot.amount++;
                 added = true;
+                setDataValues(i);
                 return added;
             }
             // 모든 슬롯 검사 결과 같은 애가 없을 때
@@ -73,6 +101,8 @@ public class InventoryManager : MonoBehaviour
                         _slot.id = inventoryItem.id;
                         _slot.amount = 1;
                         added = true;
+                        //Debug.Log("경로: "  + AssetDatabase.GetAssetPath(slots[j].itemInSlot.sprite));
+                        setDataValues(j);
                         return added;
                     }
                     // 빈 슬롯이 없을 때
@@ -111,6 +141,8 @@ public class InventoryManager : MonoBehaviour
 
     public void showHoverWindow(int id)
     {
+        hoverId = id;
+        //Debug.Log("창 띄우기 함수 실행");
         Vector2 screenPosition = Input.mousePosition;
         Vector2 pos = new Vector2(screenPosition.x + 200, screenPosition.y - 100);
 
@@ -120,18 +152,22 @@ public class InventoryManager : MonoBehaviour
         {
             hoverTitleTxt.text = foundItem.itemName;
             descriptionTxt.text = foundItem.description;
-            hoverWindow.SetActive(true);
         }
+        hoverWindow.SetActive(true);
+        // Debug.Log(hoverId);
     }
 
     public void hideHoverWindow()
     {
         hoverWindow.SetActive(false);
+        hoverId = 0;
     }
 
 
     public void setRightClickWindow()
     {
+        gameManager.uiManager.activeUI.Add(rightClickWindow);
+        buttonClick = false;
         windowOn = true;
 
         rightClickWindow.SetActive(true);
@@ -152,6 +188,14 @@ public class InventoryManager : MonoBehaviour
             else { consumeBtn.SetActive(false); }
         }
     }
+    
+    void hideRightClickWindow()
+    {
+        rightClickWindow.SetActive(false);
+        gameManager.uiManager.activeUI.Remove(rightClickWindow);
+        windowOn = false;
+    }
+
 
     void setItemControlWindow(string str)
     {
@@ -159,6 +203,15 @@ public class InventoryManager : MonoBehaviour
         selectedAmount = 0;
         titleTxt.text = str;
         itemControlWindow.SetActive(true);
+        gameManager.uiManager.activeUI.Add(itemControlWindow);
+    }
+
+    void hideItemControlWindow()
+    {
+        itemControlWindow.SetActive(false);
+        gameManager.uiManager.activeUI.Remove(itemControlWindow);
+        windowOn = false;
+
     }
 
     void SeperateItems(int num)
@@ -209,8 +262,7 @@ public class InventoryManager : MonoBehaviour
 
     public void cancelBtn()
     {
-        itemControlWindow.SetActive(false);
-        windowOn = false;
+        hideItemControlWindow();
     }
 
 
@@ -228,12 +280,11 @@ public class InventoryManager : MonoBehaviour
             SeperateItems(selectedAmount);
         }
 
-        itemControlWindow.SetActive(false);
-        windowOn = false;
+        hideItemControlWindow();
     }
 
     public void DiscardBtn()
-    {
+    {        
         buttonClick = true;
 
         // 1개보다 많을 경우 몇 개를 액션을 취해 줄것인지 결정
@@ -247,7 +298,7 @@ public class InventoryManager : MonoBehaviour
             windowOn = false;
         }
 
-        rightClickWindow.SetActive(false);
+        hideRightClickWindow();
 
     }
 
@@ -268,7 +319,7 @@ public class InventoryManager : MonoBehaviour
             setItemControlWindow("나누기");
         }
 
-        rightClickWindow.SetActive(false);
+        hideRightClickWindow();
     }
 
     public void ConsumeBtn()
@@ -279,7 +330,6 @@ public class InventoryManager : MonoBehaviour
         if (clickedSlot.amount == 0) { clickedSlot.resetSlot(); }
         Debug.Log("drank potion");
 
-        rightClickWindow.SetActive(false);
-        windowOn = false;
+        hideRightClickWindow();
     }
 }
