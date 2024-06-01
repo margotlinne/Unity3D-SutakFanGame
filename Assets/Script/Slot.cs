@@ -15,6 +15,7 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
     public bool isEmpty = true;
     public int id;
     private bool isHover = false;
+    public int slotId;
 
     void Start()
     {
@@ -65,8 +66,7 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
             if (gameManager.inventoryManager.windowOn)
             {
                 HideHover();
-            }
-            //Debug.Log("호버");        
+            }     
         }
         else
         {
@@ -76,7 +76,8 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     void HideHover()
     {
-        if (gameManager.inventoryManager.hoverId == id)
+        // 현재 떠 있는 호버의 슬롯 아이디가 내 아이디일 때 즉 나의 호버 창이 떠 있을 때
+        if (gameManager.inventoryManager.hoverId == slotId)
         {
             gameManager.inventoryManager.hideHoverWindow();
         }
@@ -98,11 +99,13 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        //Debug.Log("hovering");
         isHover = true;       
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        //Debug.Log("not hovering");
         isHover = false;
     }
 
@@ -112,9 +115,8 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         // 1초 대기
         yield return new WaitForSeconds(1f);
 
-
         // 1초 후에 수행할 작업
-        gameManager.inventoryManager.showHoverWindow(id);
+        gameManager.inventoryManager.showHoverWindow(id, slotId);
 
     }
 

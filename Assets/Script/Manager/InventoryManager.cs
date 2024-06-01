@@ -31,7 +31,7 @@ public class InventoryManager : MonoBehaviour
 
 
     [HideInInspector]
-    public int hoverId = 0;
+    public int hoverId = -1;
 
     GameManager gameManager;
 
@@ -49,27 +49,34 @@ public class InventoryManager : MonoBehaviour
         }
 
         gameManager = GameManager.instance;
+
+        // 게임 시작 시 저장된 데이터에서 값 가져오기
         for (int i = 0; i < slots.Length; i++) 
         {
             slots[i].id = gameManager.dataManager.inventoryData.itemID[i];
             slots[i].itemInSlot.sprite = Resources.Load<Sprite>(gameManager.dataManager.inventoryData.imagePath[i]);
             slots[i].isEmpty = gameManager.dataManager.inventoryData.emptySlot[i];
             slots[i].amount = gameManager.dataManager.inventoryData.itemAmount[i];
-           // Debug.Log(gameManager.dataManager.inventoryData.imagePath[i]);
-        }
 
+            // 슬롯 마다 슬롯 고유의 아이디 제공
+            slots[i].slotId = i;
+        }
     }
 
-    void setDataValues(int i)
+    void setDataValues()
     {
-        gameManager.dataManager.inventoryData.itemID[i] = slots[i].id;
+        // 데이터 입력하기
+        for (int i = 0; i < slots.Length; i++)
+        {
+            gameManager.dataManager.inventoryData.itemID[i] = slots[i].id;
 
-        string path = AssetDatabase.GetAssetPath(slots[i].itemInSlot.sprite);
-        path = path.Replace("Assets/Resources/", "").Replace(".png", "");
-        gameManager.dataManager.inventoryData.imagePath[i] = path;
+            string path = AssetDatabase.GetAssetPath(slots[i].itemInSlot.sprite);
+            path = path.Replace("Assets/Resources/", "").Replace(".png", "");
+            gameManager.dataManager.inventoryData.imagePath[i] = path;
 
-        gameManager.dataManager.inventoryData.emptySlot[i] = slots[i].isEmpty;
-        gameManager.dataManager.inventoryData.itemAmount[i] = slots[i].amount;
+            gameManager.dataManager.inventoryData.emptySlot[i] = slots[i].isEmpty;
+            gameManager.dataManager.inventoryData.itemAmount[i] = slots[i].amount;
+        }
     }
 
     public bool AddItem(InventoryItem inventoryItem)
@@ -84,7 +91,7 @@ public class InventoryManager : MonoBehaviour
             {
                 slot.amount++;
                 added = true;
-                setDataValues(i);
+                setDataValues();
                 return added;
             }
             // 모든 슬롯 검사 결과 같은 애가 없을 때
@@ -102,7 +109,7 @@ public class InventoryManager : MonoBehaviour
                         _slot.amount = 1;
                         added = true;
                         //Debug.Log("경로: "  + AssetDatabase.GetAssetPath(slots[j].itemInSlot.sprite));
-                        setDataValues(j);
+                        setDataValues();
                         return added;
                     }
                     // 빈 슬롯이 없을 때
@@ -137,11 +144,12 @@ public class InventoryManager : MonoBehaviour
         }
 
 
+
     }
 
-    public void showHoverWindow(int id)
+    public void showHoverWindow(int id, int slotId)
     {
-        hoverId = id;
+        hoverId = slotId;
         //Debug.Log("창 띄우기 함수 실행");
         Vector2 screenPosition = Input.mousePosition;
         Vector2 pos = new Vector2(screenPosition.x + 200, screenPosition.y - 100);
@@ -160,7 +168,7 @@ public class InventoryManager : MonoBehaviour
     public void hideHoverWindow()
     {
         hoverWindow.SetActive(false);
-        hoverId = 0;
+        hoverId = -1;
     }
 
 
@@ -227,6 +235,7 @@ public class InventoryManager : MonoBehaviour
                 slot.amount = num;
                 slot.itemInSlot.sprite = clickedSlot.itemInSlot.sprite;
                 slot.isEmpty = false;
+                setDataValues();
                 break;
             }
         }
@@ -280,6 +289,7 @@ public class InventoryManager : MonoBehaviour
             SeperateItems(selectedAmount);
         }
 
+        setDataValues();
         hideItemControlWindow();
     }
 
