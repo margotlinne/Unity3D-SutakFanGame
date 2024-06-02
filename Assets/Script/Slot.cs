@@ -4,18 +4,28 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.EventSystems;
+using UnityEditor;
 
-public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IDropHandler
 {
+    Image slotBox;
     Coroutine wait;
     GameManager gameManager;
-    public Image itemInSlot;
+    public Image itemImage;
     public TextMeshProUGUI amountTxt;
     public int amount;
     public bool isEmpty = true;
     public int id;
     private bool isHover = false;
     public int slotId;
+    [HideInInspector] public ItemDragDrop slotItem;
+
+
+    void Awake()
+    {
+        slotItem = itemImage.GetComponent<ItemDragDrop>();
+        slotBox = GetComponent<Image>();
+    }
 
     void Start()
     {
@@ -26,8 +36,8 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     void setImageNText()
     {
-        if (isEmpty) { itemInSlot.gameObject.SetActive(false); }
-        else if (!isEmpty) { itemInSlot.gameObject.SetActive(true); }
+        if (isEmpty) { itemImage.gameObject.SetActive(false); }
+        else if (!isEmpty) { itemImage.gameObject.SetActive(true); }
 
 
         if (amount > 1 && !isEmpty)
@@ -46,30 +56,38 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
         if (isHover)
         {
-            // 우클릭 시 아이템 버리기 등 작업 창 띄우기
-            if (Input.GetMouseButtonDown(1) && !isEmpty)
+            if (!isEmpty)
             {
-                Debug.Log("clicked");
-                gameManager.inventoryManager.clickedSlot = this;
-                gameManager.inventoryManager.setRightClickWindow();
+                // 우클릭 시 아이템 버리기 등 작업 창 띄우기
+                if (Input.GetMouseButtonDown(1))
+                {
+                    Debug.Log("clicked");
+                    gameManager.inventoryManager.clickedSlot = this;
+                    gameManager.inventoryManager.setRightClickWindow();
+                }
+
+                // 호버 시 호버 창 띄우기 (wait이 null일 때 조건을 안 주니 이상했음)
+                if (wait == null)
+                {
+                    wait = StartCoroutine(ShowItemDetail());
+                }
+
+                // 우클릭 윈도우나 버리기/나누기 숫자 셀렉터 윈도우가 떠 있을 땐 호버 숨기기
+                if (gameManager.inventoryManager.windowOn)
+                {
+                    HideHover();
+                }
             }
 
-
-
-            // 호버 시 호버 창 띄우기 (wait이 null일 때 조건을 안 주니 이상했음)
-            if (wait == null)
+            if (gameManager.inventoryManager.grappedItem)
             {
-                wait = StartCoroutine(ShowItemDetail());
+                changeTransparency(0.5f);
             }
-            
-            // 우클릭 윈도우나 버리기/나누기 숫자 셀렉터 윈도우가 떠 있을 땐 호버 숨기기
-            if (gameManager.inventoryManager.windowOn)
-            {
-                HideHover();
-            }     
+           
         }
-        else
+        else if (!isHover)
         {
+            changeTransparency(1f);
             HideHover();
         }        
     }
@@ -96,16 +114,21 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
         amount = 0;
         amountTxt.text = "";
     }
+    
+    void changeTransparency(float value)
+    {
+        Color slotColor = slotBox.color;
+        slotColor.a = value;
+        slotBox.color = slotColor;
+    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        //Debug.Log("hovering");
         isHover = true;       
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
-        //Debug.Log("not hovering");
         isHover = false;
     }
 
@@ -120,4 +143,73 @@ public class Slot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 
     }
 
+    // 아이템이 해당 슬롯에 드롭될 때
+    public void OnDrop(PointerEventData eventData)
+    {
+        GameObject droppedItem = eventData.pointerDrag;
+        ItemDragDrop itemDragDrop = droppedItem.GetComponent<ItemDragDrop>();
+
+
+        // 놓으려는 슬롯에 아이템이 없다면
+        if (isEmpty)
+        {
+            Debug.Log("빈 슬롯에 아이템 드롭");
+            id = itemDragDrop.droppedItemID;
+            amount = itemDragDrop.droppedItemAmount;
+            itemImage.sprite = Resources.Load<Sprite>(itemDragDrop.droppedItemImagePath);
+
+            // 원래 아이템이 있던 슬롯 초기화
+            itemDragDrop.parentObj.resetSlot();
+
+            // 아이템을 받은 해당 슬롯의 아이템 업데이트            
+            slotItem.setParentData();
+            isEmpty = false;
+
+
+            Debug.Log("id: " + id + " amoount: " + amount);
+            
+        }
+        // 아이템이 있는 슬롯이나 본인 슬롯이 아닌 경우
+        else if (slotId != itemDragDrop.parentObj.slotId)
+        {
+            Debug.Log("아이템 있는 슬롯에 아이템 드롭");
+            int changeID = 0;
+            int changeAmount = 0;
+            string changeImagePath = "";
+
+            // 놓으려는 슬롯의 아이템과 놓는 아이템의 종류가 같다면
+            if (id == itemDragDrop.droppedItemID)
+            {
+                amount++;
+
+                // 원래 아이템이 있던 슬롯 초기화
+                itemDragDrop.parentObj.resetSlot();
+
+                // 아이템을 받은 해당 슬롯의 아이템 업데이트
+                slotItem.setParentData();
+            }
+            else
+            {
+                // 놓는 아이템과 놓으려는 곳의 아이템의 데이터를 교환
+                changeID = id;
+                changeAmount = amount;
+                string path = AssetDatabase.GetAssetPath(itemImage.sprite);
+                changeImagePath = path.Replace("Assets/Resources/", "").Replace(".png", "");
+
+                id = itemDragDrop.droppedItemID;
+                amount = itemDragDrop.droppedItemAmount;
+                itemImage.sprite = Resources.Load<Sprite>(itemDragDrop.droppedItemImagePath);
+
+                Debug.Log(changeID + " after change: " + id);
+                itemDragDrop.droppedItemID = changeID;
+                itemDragDrop.droppedItemAmount = changeAmount;
+                itemDragDrop.droppedItemImagePath = changeImagePath;
+
+                itemDragDrop.afterSwapItems();
+                slotItem.setParentData();
+            }          
+        }
+
+
+    }
 }

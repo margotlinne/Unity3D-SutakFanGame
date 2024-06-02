@@ -28,13 +28,15 @@ public class InventoryManager : MonoBehaviour
     private int selectedAmount = 0;
     private bool buttonClick = false;
     public bool windowOn = false;
+    public bool grappedItem = false;
+
 
 
     [HideInInspector]
     public int hoverId = -1;
 
     GameManager gameManager;
-
+    
     void Start()
     {
         hoverWindow.SetActive(false);
@@ -54,7 +56,7 @@ public class InventoryManager : MonoBehaviour
         for (int i = 0; i < slots.Length; i++) 
         {
             slots[i].id = gameManager.dataManager.inventoryData.itemID[i];
-            slots[i].itemInSlot.sprite = Resources.Load<Sprite>(gameManager.dataManager.inventoryData.imagePath[i]);
+            slots[i].itemImage.sprite = Resources.Load<Sprite>(gameManager.dataManager.inventoryData.imagePath[i]);
             slots[i].isEmpty = gameManager.dataManager.inventoryData.emptySlot[i];
             slots[i].amount = gameManager.dataManager.inventoryData.itemAmount[i];
 
@@ -63,14 +65,14 @@ public class InventoryManager : MonoBehaviour
         }
     }
 
-    void setDataValues()
+    public void setDataValues()
     {
         // 데이터 입력하기
         for (int i = 0; i < slots.Length; i++)
         {
             gameManager.dataManager.inventoryData.itemID[i] = slots[i].id;
 
-            string path = AssetDatabase.GetAssetPath(slots[i].itemInSlot.sprite);
+            string path = AssetDatabase.GetAssetPath(slots[i].itemImage.sprite);
             path = path.Replace("Assets/Resources/", "").Replace(".png", "");
             gameManager.dataManager.inventoryData.imagePath[i] = path;
 
@@ -90,8 +92,9 @@ public class InventoryManager : MonoBehaviour
             if (slot.id == inventoryItem.id)
             {
                 slot.amount++;
+                slot.slotItem.setParentData();
                 added = true;
-                setDataValues();
+                //setDataValues();
                 return added;
             }
             // 모든 슬롯 검사 결과 같은 애가 없을 때
@@ -103,13 +106,14 @@ public class InventoryManager : MonoBehaviour
                     Slot _slot = slots[j].GetComponent<Slot>();
                     if (_slot.isEmpty)
                     {
-                        _slot.itemInSlot.sprite = inventoryItem.icon;
+                        _slot.itemImage.sprite = inventoryItem.icon;
                         _slot.isEmpty = false;
                         _slot.id = inventoryItem.id;
                         _slot.amount = 1;
                         added = true;
                         //Debug.Log("경로: "  + AssetDatabase.GetAssetPath(slots[j].itemInSlot.sprite));
-                        setDataValues();
+                        //setDataValues();
+                        _slot.slotItem.setParentData();
                         return added;
                     }
                     // 빈 슬롯이 없을 때
@@ -224,21 +228,28 @@ public class InventoryManager : MonoBehaviour
 
     void SeperateItems(int num)
     {
-        clickedSlot.amount -= num;
-
-        for (int i = 0; i < slots.Length; i++)
+        if (num > 0)
         {
-            Slot slot = slots[i].GetComponent<Slot>();
-            if (slot.isEmpty)
+            clickedSlot.amount -= num;
+
+            for (int i = 0; i < slots.Length; i++)
             {
-                slot.id = clickedSlot.id;
-                slot.amount = num;
-                slot.itemInSlot.sprite = clickedSlot.itemInSlot.sprite;
-                slot.isEmpty = false;
-                setDataValues();
-                break;
+                Slot slot = slots[i].GetComponent<Slot>();
+                if (slot.isEmpty)
+                {
+                    slot.id = clickedSlot.id;
+                    slot.amount = num;
+                    slot.itemImage.sprite = clickedSlot.itemImage.sprite;
+                    slot.isEmpty = false;
+
+                    // 나눠진 슬롯과 새로 나뉘어서 아이템이 추가된 슬롯의 아이템 데이터를 부모 슬롯 값으로 설정
+                    slot.slotItem.setParentData();
+                    clickedSlot.slotItem.setParentData();
+                    //setDataValues();
+                    break;
+                }
             }
-        }
+        }        
 
     }
 
@@ -283,13 +294,15 @@ public class InventoryManager : MonoBehaviour
         {
             clickedSlot.amount -= selectedAmount;
             if( clickedSlot.amount == 0) { clickedSlot.resetSlot(); }
+            // 버리고 나서 amount 값을 업데이트하기 위해 슬롯의 아이템 값을 부모 슬롯의 값으로 설정
+            clickedSlot.slotItem.setParentData();
         }
         else if (titleTxt.text == "나누기")
         {
             SeperateItems(selectedAmount);
         }
 
-        setDataValues();
+        //setDataValues();
         hideItemControlWindow();
     }
 
@@ -340,6 +353,8 @@ public class InventoryManager : MonoBehaviour
         if (clickedSlot.amount == 0) { clickedSlot.resetSlot(); }
         Debug.Log("drank potion");
 
-        hideRightClickWindow();
+        hideRightClickWindow();            
+        // 소모하고 나서 amount 값을 업데이트하기 위해 슬롯의 아이템 값을 부모 슬롯의 값으로 설정
+        clickedSlot.slotItem.setParentData();
     }
 }

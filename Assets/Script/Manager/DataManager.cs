@@ -7,6 +7,7 @@ using JetBrains.Annotations;
 
 public class DataManager : MonoBehaviour
 {
+    GameManager gameManager;
     public PlayerData playerData = new PlayerData();
     public MapData mapData = new MapData();
     public InventoryData inventoryData = new InventoryData(40);
@@ -23,6 +24,10 @@ public class DataManager : MonoBehaviour
         LoadData();
     }
 
+    void Start()
+    {
+        gameManager = GameManager.instance;
+    }
 
     void Update()
     {
@@ -42,6 +47,8 @@ public class DataManager : MonoBehaviour
         string data_map = JsonUtility.ToJson(mapData);
         File.WriteAllText(path + map_filename, data_map);
 
+
+        gameManager.inventoryManager.setDataValues();
         string data_inventory = JsonUtility.ToJson(inventoryData);
         File.WriteAllText(path + inventory_filename, data_inventory);
     }
