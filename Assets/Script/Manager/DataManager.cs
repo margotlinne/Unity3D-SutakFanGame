@@ -11,7 +11,7 @@ public class DataManager : MonoBehaviour
     public PlayerData playerData = new PlayerData();
     public MapData mapData = new MapData();
     public InventoryData inventoryData = new InventoryData(40);
-    public EquipData equipData = new EquipData(4);
+    public InventoryData equipData = new InventoryData(4);
 
     string path;
     string player_filename = "player_data";
@@ -22,7 +22,7 @@ public class DataManager : MonoBehaviour
     void Awake()
     {
         path = Application.persistentDataPath + "/";
-        //Debug.Log(path);
+        Debug.Log(path);
         LoadData();
     }
 
@@ -79,7 +79,7 @@ public class DataManager : MonoBehaviour
         if(File.Exists(path + equip_filename))
         {
             string data_equip = File.ReadAllText(path + equip_filename);
-            equipData = JsonUtility.FromJson<EquipData>(data_equip);
+            equipData = JsonUtility.FromJson<InventoryData>(data_equip);
         }
 
     }

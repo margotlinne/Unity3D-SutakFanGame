@@ -10,7 +10,7 @@ public class InventoryItem : ScriptableObject
     [TextArea(5, 10)]
     public string description;
     public ItemType iteype;
-    public ArmorType armorType;
+    public EquipType equipType;
     public PotionType potionType;
     public Sprite icon;
     public bool consumable;
@@ -20,4 +20,4 @@ public class InventoryItem : ScriptableObject
 }
 public enum PotionType { healthUp, damageUp, armourUp, evasionUp, criticalUp, None}
 public enum ItemType { Potion, Ingredient, Armor}
-public enum ArmorType { cape, hat, boots, gloves, None}
+public enum EquipType { cape, boots, sword, bow, None}

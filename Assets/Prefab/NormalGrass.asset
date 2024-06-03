@@ -18,8 +18,11 @@ MonoBehaviour:
     \uAC83\uB9CC \uAC19\uC740 \uBB34\uB09C\uD558\uACE0\uB3C4 \uD3C9\uBC94\uD558\uAE30
     \uC9DD\uC774 \uC5C6\uB294 \uC7A1\uCD08. \uD558\uC9C0\uB9CC \uC88B\uC740 \uBB3C\uC57D
     \uC7AC\uB8CC\uAC00 \uB420 \uAC83\uC774\uB2E4."
-  type: 5
+  iteype: 1
+  equipType: 4
+  potionType: 5
   icon: {fileID: 21300000, guid: 59c2272587b0cef4482bfd9a6538f9e2, type: 3}
   consumable: 0
   craftable: 1
   stackable: 1
+  equipable: 0

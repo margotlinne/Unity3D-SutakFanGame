@@ -1,3 +1,4 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,7 +9,7 @@ public class EquipData
     public int[] itemID;
     public bool[] emptySlot;
     public bool equipable;
-    public string[] armorType;
+    public string[] equipType;
 
     public EquipData(int size)
     {
@@ -24,6 +25,7 @@ public class EquipData
             imagePath[i] = "Resources/unity_builtin_extra";
             itemID[i] = 0;
             emptySlot[i] = true;
+            equipType[i] = "none";
         }
 
     }
