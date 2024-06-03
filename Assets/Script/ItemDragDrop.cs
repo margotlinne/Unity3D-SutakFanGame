@@ -8,8 +8,10 @@ using UnityEngine.UI;
 public class ItemDragDrop : MonoBehaviour, IBeginDragHandler, IEndDragHandler, IDragHandler
 {
     public Image image;
-    public Slot parentObj;
+    public InventorySlot parentObj;
+    
     GameManager gameManager;
+    [HideInInspector] public bool isEquipable;
     [HideInInspector] public bool isDrag;
     [HideInInspector] public int droppedItemID;
     [HideInInspector] public int droppedItemAmount;
@@ -32,7 +34,9 @@ public class ItemDragDrop : MonoBehaviour, IBeginDragHandler, IEndDragHandler, I
         parentObj.id = droppedItemID;
         parentObj.amount = droppedItemAmount;
         parentObj.itemImage.sprite = Resources.Load<Sprite>(droppedItemImagePath);
-       // parentObj.isEmpty = droppedItemEmpty;
+        parentObj.equipableInSlot = isEquipable;
+
+        //parentObj.isEmpty = droppedItemEmpty;
     }
 
     public void setParentData()
@@ -41,6 +45,8 @@ public class ItemDragDrop : MonoBehaviour, IBeginDragHandler, IEndDragHandler, I
         droppedItemAmount = parentObj.amount;
         string path = AssetDatabase.GetAssetPath(parentObj.itemImage.sprite);
         droppedItemImagePath = path.Replace("Assets/Resources/", "").Replace(".png", "");
+        isEquipable = parentObj.equipableInSlot;
+
         //droppedItemEmpty = parentObj.isEmpty;
     }
 
@@ -55,6 +61,8 @@ public class ItemDragDrop : MonoBehaviour, IBeginDragHandler, IEndDragHandler, I
 
         // 아이템 드래그를 놓을 때 슬롯에 놓았는지 확인하기 위해 레이캐스트를 꺼두고 슬롯에 레이캐스트가 닿도록 
         image.raycastTarget = false;
+
+        Debug.Log(isEquipable);
     }
 
     public void OnDrag(PointerEventData eventData)

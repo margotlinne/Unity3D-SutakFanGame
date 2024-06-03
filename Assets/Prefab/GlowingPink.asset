@@ -22,3 +22,4 @@ MonoBehaviour:
   consumable: 0
   craftable: 1
   stackable: 1
+  equipable: 0

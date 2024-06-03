@@ -11,11 +11,13 @@ public class DataManager : MonoBehaviour
     public PlayerData playerData = new PlayerData();
     public MapData mapData = new MapData();
     public InventoryData inventoryData = new InventoryData(40);
+    public EquipData equipData = new EquipData(4);
 
     string path;
     string player_filename = "player_data";
     string map_filename = "map_data";
     string inventory_filename = "inventory_data";
+    string equip_filename = "equip_data";
 
     void Awake()
     {
@@ -51,6 +53,8 @@ public class DataManager : MonoBehaviour
         gameManager.inventoryManager.setDataValues();
         string data_inventory = JsonUtility.ToJson(inventoryData);
         File.WriteAllText(path + inventory_filename, data_inventory);
+        string data_equip = JsonUtility.ToJson(equipData);
+        File.WriteAllText(path + equip_filename, data_equip);
     }
     public void LoadData()
     {
@@ -70,6 +74,12 @@ public class DataManager : MonoBehaviour
         {
             string data_inventory = File.ReadAllText(path + inventory_filename);
             inventoryData = JsonUtility.FromJson<InventoryData>(data_inventory);
+        }
+
+        if(File.Exists(path + equip_filename))
+        {
+            string data_equip = File.ReadAllText(path + equip_filename);
+            equipData = JsonUtility.FromJson<EquipData>(data_equip);
         }
 
     }

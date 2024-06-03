@@ -8,12 +8,15 @@ using TMPro;
 public class InventoryManager : MonoBehaviour
 {
     [HideInInspector]
-    public Slot clickedSlot;
-    public Slot[] slots;
+    public InventorySlot clickedSlot;
+    public InventorySlot[] inventorySlots;
+    public InventorySlot[] equipSlots;
 
-    public InventoryItem[] items;
+    public InventoryItem[] inventoryItems;
+    public InventoryItem[] equipItems;
 
     private Dictionary<int, InventoryItem> itemDictionary;
+    private Dictionary<int, InventoryItem> equipItemDictionary;
 
     public GameObject hoverWindow;
     public GameObject rightClickWindow;
@@ -45,39 +48,68 @@ public class InventoryManager : MonoBehaviour
 
         itemDictionary = new Dictionary<int, InventoryItem>();
 
-        foreach (var item in items)
+        foreach (var item in inventoryItems)
         {
             itemDictionary[item.id] = item;
+        }
+
+        equipItemDictionary = new Dictionary<int, InventoryItem>();
+
+        foreach (var item in equipItems)
+        {
+            equipItemDictionary[item.id] = item;
         }
 
         gameManager = GameManager.instance;
 
         // 게임 시작 시 저장된 데이터에서 값 가져오기
-        for (int i = 0; i < slots.Length; i++) 
+        for (int i = 0; i < inventorySlots.Length; i++) 
         {
-            slots[i].id = gameManager.dataManager.inventoryData.itemID[i];
-            slots[i].itemImage.sprite = Resources.Load<Sprite>(gameManager.dataManager.inventoryData.imagePath[i]);
-            slots[i].isEmpty = gameManager.dataManager.inventoryData.emptySlot[i];
-            slots[i].amount = gameManager.dataManager.inventoryData.itemAmount[i];
-
+            inventorySlots[i].id = gameManager.dataManager.inventoryData.itemID[i];
+            inventorySlots[i].itemImage.sprite = Resources.Load<Sprite>(gameManager.dataManager.inventoryData.imagePath[i]);
+            inventorySlots[i].isEmpty = gameManager.dataManager.inventoryData.emptySlot[i];
+            inventorySlots[i].amount = gameManager.dataManager.inventoryData.itemAmount[i];
+            inventorySlots[i].isEquipSlot = false;
+            inventorySlots[i].armorType = "none";
             // 슬롯 마다 슬롯 고유의 아이디 제공
-            slots[i].slotId = i;
+            inventorySlots[i].slotId = i;
+        }
+
+        for (int i = 0; i < equipSlots.Length; i++)
+        {
+            equipSlots[i].id = gameManager.dataManager.equipData.itemID[i];
+            equipSlots[i].itemImage.sprite = Resources.Load<Sprite>(gameManager.dataManager.equipData.imagePath[i]);
+            equipSlots[i].isEmpty = gameManager.dataManager.equipData.emptySlot[i];
+            equipSlots[i].isEquipSlot = true;
+            equipSlots[i].slotId = inventorySlots.Length + i;
         }
     }
+
 
     public void setDataValues()
     {
         // 데이터 입력하기
-        for (int i = 0; i < slots.Length; i++)
+        for (int i = 0; i < inventorySlots.Length; i++)
         {
-            gameManager.dataManager.inventoryData.itemID[i] = slots[i].id;
+            gameManager.dataManager.inventoryData.itemID[i] = inventorySlots[i].id;
 
-            string path = AssetDatabase.GetAssetPath(slots[i].itemImage.sprite);
+            string path = AssetDatabase.GetAssetPath(inventorySlots[i].itemImage.sprite);
             path = path.Replace("Assets/Resources/", "").Replace(".png", "");
             gameManager.dataManager.inventoryData.imagePath[i] = path;
 
-            gameManager.dataManager.inventoryData.emptySlot[i] = slots[i].isEmpty;
-            gameManager.dataManager.inventoryData.itemAmount[i] = slots[i].amount;
+            gameManager.dataManager.inventoryData.emptySlot[i] = inventorySlots[i].isEmpty;
+            gameManager.dataManager.inventoryData.itemAmount[i] = inventorySlots[i].amount;
+        }
+
+        for (int i = 0; i < equipSlots.Length; i++)
+        {
+            gameManager.dataManager.equipData.itemID[i] = equipSlots[i].id;
+
+            string path = AssetDatabase.GetAssetPath(equipSlots[i].itemImage.sprite);
+            path = path.Replace("Assets/Resources/", "").Replace(".png", "");
+            gameManager.dataManager.equipData.imagePath[i] = path;
+
+            gameManager.dataManager.equipData.emptySlot[i] = equipSlots[i].isEmpty;
         }
     }
 
@@ -85,11 +117,11 @@ public class InventoryManager : MonoBehaviour
     {
         bool added = false;
 
-        for (int i =0; i < slots.Length; i++) 
+        for (int i =0; i < inventorySlots.Length; i++) 
         {
-            Slot slot = slots[i].GetComponent<Slot>();
-            // 슬롯에 같은 아이템을 발견했을 때
-            if (slot.id == inventoryItem.id)
+            InventorySlot slot = inventorySlots[i].GetComponent<InventorySlot>();
+            // 슬롯에 같은 아이템을 발견했을 때, 그리고 쌓을 수 있을 때
+            if (slot.id == inventoryItem.id && checkStakcability(slot.id))
             {
                 slot.amount++;
                 slot.slotItem.setParentData();
@@ -97,13 +129,13 @@ public class InventoryManager : MonoBehaviour
                 //setDataValues();
                 return added;
             }
-            // 모든 슬롯 검사 결과 같은 애가 없을 때
-            else if (i == slots.Length - 1)
+            // 모든 슬롯 검사 결과 같은 애가 없을 때 혹은 쌓을 수 없을 때
+            else if (i == inventorySlots.Length - 1 || !checkStakcability(slot.id))
             {
                 // 빈 슬롯에 추가
-                for(int j = 0; j < slots.Length; j++)
+                for(int j = 0; j < inventorySlots.Length; j++)
                 {
-                    Slot _slot = slots[j].GetComponent<Slot>();
+                    InventorySlot _slot = inventorySlots[j].GetComponent<InventorySlot>();
                     if (_slot.isEmpty)
                     {
                         _slot.itemImage.sprite = inventoryItem.icon;
@@ -113,11 +145,22 @@ public class InventoryManager : MonoBehaviour
                         added = true;
                         //Debug.Log("경로: "  + AssetDatabase.GetAssetPath(slots[j].itemInSlot.sprite));
                         //setDataValues();
+                        if (inventoryItem.equipable)
+                        {
+                            Debug.Log("장비 아이템 획득");
+                            _slot.equipableInSlot = true;
+                        }
+                        else
+                        {
+                            Debug.Log("기본 아이템 획득");
+                            _slot.equipableInSlot = false;
+                        }
+
                         _slot.slotItem.setParentData();
                         return added;
                     }
                     // 빈 슬롯이 없을 때
-                    else if (j == slots.Length - 1)
+                    else if (j == inventorySlots.Length - 1)
                     {
                         Debug.Log("inventory is full!");
                         added = false;
@@ -151,21 +194,57 @@ public class InventoryManager : MonoBehaviour
 
     }
 
-    public void showHoverWindow(int id, int slotId)
+    public bool checkStakcability(int id)
+    {
+        if(itemDictionary.TryGetValue(id, out InventoryItem foundItem))
+        {
+            return foundItem.stackable;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public string checkArmourType(int id)
+    {
+        if (equipItemDictionary.TryGetValue(id, out InventoryItem foundItem))
+        {
+            return foundItem.armorType.ToString();
+        }
+        else
+        {
+            return "none";
+        }
+    }
+
+    public void showHoverWindow(int id, int slotId, bool equipable)
     {
         hoverId = slotId;
-        //Debug.Log("창 띄우기 함수 실행");
         Vector2 screenPosition = Input.mousePosition;
         Vector2 pos = new Vector2(screenPosition.x + 200, screenPosition.y - 100);
 
         hoverWindow.transform.position = pos;
 
-        if (itemDictionary.TryGetValue(id, out InventoryItem foundItem))
+        // 기본 인벤토리 갯수에 이어서 장비란의 id 값이 정해졌으므로
+        if (!equipable)
         {
-            hoverTitleTxt.text = foundItem.itemName;
-            descriptionTxt.text = foundItem.description;
+            if (itemDictionary.TryGetValue(id, out InventoryItem foundItem))
+            {
+                hoverTitleTxt.text = foundItem.itemName;
+                descriptionTxt.text = foundItem.description;
+            }
+        }
+        else
+        {
+            if (equipItemDictionary.TryGetValue(id, out InventoryItem foundItem))
+            {
+                hoverTitleTxt.text = foundItem.itemName;
+                descriptionTxt.text = foundItem.description;
+            }
         }
         hoverWindow.SetActive(true);
+        //Debug.Log("창 띄우기 함수 실행");
         // Debug.Log(hoverId);
     }
 
@@ -192,12 +271,25 @@ public class InventoryManager : MonoBehaviour
         if (clickedSlot.amount == 1){ seperateBtn.SetActive(false); }
         else { seperateBtn.SetActive(true); }
 
-
+        InventoryItem foundItem;
         // 소비 가능 아이템이 아니라면 소모 버튼은 미표시
-        if (itemDictionary.TryGetValue(clickedSlot.id, out InventoryItem foundItem))
+        // 장비란
+        if (clickedSlot.isEquipSlot)
         {
-            if(foundItem.consumable) { consumeBtn.SetActive(true); }
-            else { consumeBtn.SetActive(false); }
+            if (equipItemDictionary.TryGetValue(clickedSlot.id, out foundItem))
+            {
+                if (foundItem.consumable) { consumeBtn.SetActive(true); }
+                else { consumeBtn.SetActive(false); }
+            }           
+        }
+        // 기본 인벤토리
+        else
+        {
+            if (itemDictionary.TryGetValue(clickedSlot.id, out foundItem))
+            {
+                if (foundItem.consumable) { consumeBtn.SetActive(true); }
+                else { consumeBtn.SetActive(false); }
+            }            
         }
     }
     
@@ -232,9 +324,9 @@ public class InventoryManager : MonoBehaviour
         {
             clickedSlot.amount -= num;
 
-            for (int i = 0; i < slots.Length; i++)
+            for (int i = 0; i < inventorySlots.Length; i++)
             {
-                Slot slot = slots[i].GetComponent<Slot>();
+                InventorySlot slot = inventorySlots[i].GetComponent<InventorySlot>();
                 if (slot.isEmpty)
                 {
                     slot.id = clickedSlot.id;
@@ -333,11 +425,11 @@ public class InventoryManager : MonoBehaviour
         // 1개보다 많을 경우 몇 개를 액션을 취해 줄것인지 결정
         if (clickedSlot.amount > 1)
         {
-            for (int i = 0; i < slots.Length; i++) 
+            for (int i = 0; i < inventorySlots.Length; i++) 
             {
-                Slot slot = slots[i].GetComponent<Slot>();
+                InventorySlot slot = inventorySlots[i].GetComponent<InventorySlot>();
                 if (slot.isEmpty) { break; }
-                else if (i == slots.Length - 1) { Debug.Log("invetory is full, can't seperate the items!"); }
+                else if (i == inventorySlots.Length - 1) { Debug.Log("invetory is full, can't seperate the items!"); }
             }
             setItemControlWindow("나누기");
         }

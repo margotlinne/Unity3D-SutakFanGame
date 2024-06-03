@@ -7,6 +7,7 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager instance;
 
+    public EquipManager equipManager;
     public InventoryManager inventoryManager;
     public UIManager uiManager;
     public BattleManager battleManager;
