@@ -7,7 +7,7 @@ public class EquipData
 {
     public string[] imagePath;
     public int[] itemID;
-    public bool[] emptySlot;
+    //public bool[] emptySlot;
     public bool equipable;
     public string[] equipType;
 
@@ -15,7 +15,7 @@ public class EquipData
     {
         imagePath = new string[size];
         itemID = new int[size];
-        emptySlot = new bool[size];
+       // emptySlot = new bool[size];
         equipable = true;
 
 
@@ -24,7 +24,7 @@ public class EquipData
         {
             imagePath[i] = "Resources/unity_builtin_extra";
             itemID[i] = 0;
-            emptySlot[i] = true;
+           // emptySlot[i] = true;
             equipType[i] = "none";
         }
 

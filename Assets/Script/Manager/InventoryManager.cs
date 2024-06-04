@@ -6,6 +6,7 @@ using UnityEngine.EventSystems;
 using TMPro;
 using Unity.VisualScripting;
 using static UnityEditor.Progress;
+using UnityEngine.ProBuilder.MeshOperations;
 
 public enum equipSlotType { cape, boots, sword, bow }
 
@@ -15,12 +16,17 @@ public class InventoryManager : MonoBehaviour
     public InventorySlot clickedSlot;
     public InventorySlot[] inventorySlots;
     public InventorySlot[] equipSlots;
+    public InventorySlot[] craftSlots;
 
     public InventoryItem[] inventoryItems;
     public InventoryItem[] equipItems;
+    public InventoryItem[] craftItems;
+    public InventoryItem[] allItems;
 
-    private Dictionary<int, InventoryItem> itemDictionary;
+    private Dictionary<int, InventoryItem> invenItemDictionary;
     private Dictionary<int, InventoryItem> equipItemDictionary;
+    private Dictionary<CraftType, InventoryItem> craftItemDictionary;
+    private Dictionary<int, InventoryItem> allItemDictionary;
 
     public GameObject hoverWindow;
     public GameObject rightClickWindow;
@@ -29,6 +35,7 @@ public class InventoryManager : MonoBehaviour
     public GameObject consumeBtn;
     public GameObject equipBtn;
     public GameObject craftBtn;
+    public TextMeshProUGUI craftBtnTxt;
     public TextMeshProUGUI equipBtnTxt;
     public TextMeshProUGUI hoverTitleTxt;
     public TextMeshProUGUI descriptionTxt;
@@ -53,11 +60,18 @@ public class InventoryManager : MonoBehaviour
         rightClickWindow.SetActive(false);
         itemControlWindow.SetActive(false);
 
-        itemDictionary = new Dictionary<int, InventoryItem>();
+        allItemDictionary = new Dictionary<int, InventoryItem>();
+
+        foreach (var item in allItems)
+        {
+            allItemDictionary[item.id] = item;
+        }
+
+        invenItemDictionary = new Dictionary<int, InventoryItem>();
 
         foreach (var item in inventoryItems)
         {
-            itemDictionary[item.id] = item;
+            invenItemDictionary[item.id] = item;
         }
 
         equipItemDictionary = new Dictionary<int, InventoryItem>();
@@ -65,6 +79,13 @@ public class InventoryManager : MonoBehaviour
         foreach (var item in equipItems)
         {
             equipItemDictionary[item.id] = item;
+        }
+
+        craftItemDictionary = new Dictionary<CraftType, InventoryItem>();
+
+        foreach (var item in craftItems)
+        {
+            craftItemDictionary[item.craftType] = item;
         }
 
         gameManager = GameManager.instance;
@@ -76,6 +97,7 @@ public class InventoryManager : MonoBehaviour
             inventorySlots[i].itemImage.sprite = Resources.Load<Sprite>(gameManager.dataManager.inventoryData.imagePath[i]);
             inventorySlots[i].isEmpty = gameManager.dataManager.inventoryData.emptySlot[i];
             inventorySlots[i].isEquipSlot = false;
+            inventorySlots[i].isCraftSlot = false;
             inventorySlots[i].equipType = gameManager.dataManager.inventoryData.equipType[i];
 
             inventorySlots[i].amount = gameManager.dataManager.inventoryData.itemAmount[i];
@@ -92,6 +114,7 @@ public class InventoryManager : MonoBehaviour
             equipSlots[i].itemImage.sprite = Resources.Load<Sprite>(gameManager.dataManager.equipData.imagePath[i]);
             equipSlots[i].isEmpty = gameManager.dataManager.equipData.emptySlot[i];
             equipSlots[i].isEquipSlot = true;
+            equipSlots[i].isCraftSlot = false;
 
             // equiptype은 각 슬롯에 인스펙터에서 직접 할당
 
@@ -100,6 +123,17 @@ public class InventoryManager : MonoBehaviour
 
             // 슬롯 마다 슬롯 고유의 아이디 제공
             equipSlots[i].slotId = inventorySlots.Length + i;
+        }
+
+        // 조합 슬롯은 게임을 끝내도 해당 란에 저장되어 있을 필요가 없으므로 데이터 저장은 안 함
+        for (int i = 0; i < craftSlots.Length; i++) 
+        {
+            craftSlots[i].resetSlot();
+            craftSlots[i].isEquipSlot = false;
+            craftSlots[i].isCraftSlot = true;
+
+            // 슬롯 마다 슬롯 고유의 아이디 제공
+            craftSlots[i].slotId = (inventorySlots.Length + equipSlots.Length) + i;
         }
     }
 
@@ -179,6 +213,7 @@ public class InventoryManager : MonoBehaviour
         return added;
     }
 
+    // 주운 아이템을 새로운 빈 슬롯에 추가하는 메서드. 아이템을 드래그앤 드롭으로 빈 슬롯에 놓는 것과 다른 개념
     bool IntoEmptySlot(InventoryItem inventoryItem)
     {
         bool val = false;
@@ -233,32 +268,155 @@ public class InventoryManager : MonoBehaviour
         }
 
 
+        // 인벤토리 창이 사라졌을 때, 조합란에 있던 애들을 다시 인벤토리란으로 이동
+        if (!gameManager.uiManager.inventoryCanvas.activeSelf)
+        {
+            for (int i = 0; i < craftSlots.Length; i++)
+            {
+                // 조합란이 비어 있지 않으면 
+                if (!craftSlots[i].isEmpty)
+                {
+                    CraftslotToInventory(craftSlots[i]);
+                }
+            }
+        }
+
     }
 
+    public void CraftslotToInventory(InventorySlot slot)
+    {
+        // 조합란의 아이템이 쌓기 가능한 아이템일 때
+        if (checkStackability(slot.id))
+        {
+            //Debug.Log("쌓기 가능한 아이템이 조합란에서 인벤토리란으로");
+            for (int j = 0; j < inventorySlots.Length; j++)
+            {
+                // 인벤토리란 내에 같은 아이템이 있다면 쌓기
+                if (inventorySlots[j].id == slot.id)
+                {
+                    // Debug.Log("같은 아이템 찾음-----------");
+                    inventorySlots[j].amount++;
+                    inventorySlots[j].slotItem.setParentData();
+                    slot.resetSlot();
+                    break;
+                }
+                // 마지막 슬롯까지 같은 아이템을 못 찾았다면
+                else if (j == inventorySlots.Length - 1)
+                {
+                    // Debug.Log("같은 아이템 못 찾음**********");
+                    for (int p = 0; p < inventorySlots.Length; p++)
+                    {
+                        // 비어 있는 슬롯을 찾아서 해당 조합란의 아이템 이동 
+                        if (inventorySlots[p].isEmpty)
+                        {
+                            slot.IntoEmptySlot(inventorySlots[p], slot.slotItem);
+                            break;
+                        }
+                        // 비어 있는 슬롯이 없는 경우는 생기지 않도록 빈 슬롯이 하나 뿐일 때 나누기 버튼을 못하게 막을 것임                                    
+                    }
+                    break;
+                }
+            }
+        }
+        // 쌓기 불가능한 아이템일 땐 빈 슬롯으로
+        else
+        {
+            for (int j = 0; j < inventorySlots.Length; j++)
+            {
+                // 비어 있는 슬롯을 찾아서 해당 조합란의 아이템 이동 
+                if (inventorySlots[j].isEmpty)
+                {
+                    slot.IntoEmptySlot(inventorySlots[j], slot.slotItem);
+                    break;
+                }
+                // 비어 있는 슬롯이 없는 경우는 생기지 않도록 빈 슬롯이 하나 뿐일 때 나누기 버튼을 못하게 막을 것임                                    
+            }
+        }
+    }
+
+    public InventoryItem returnInventoryItem(int id)
+    {
+        InventoryItem item = null;
+        if (invenItemDictionary.TryGetValue(id, out InventoryItem foundItem))
+        {
+            item = foundItem;
+        }
+        return item;
+    }
+    
+    // 조합 결과 아이템의 아이디 변환
+    public int checkCraftID(CraftType type)
+    {
+        int returnVal = 0;
+        if (craftItemDictionary.TryGetValue(type, out InventoryItem foundItem))
+        {
+            returnVal = foundItem.id;
+            
+        }
+
+        return returnVal;
+    }
+
+
+    // 해당 조합 가능 아이템의 조합 결과 타입 반환
+    public CraftType checkCraftType(int id)
+    {
+        CraftType returnVal = CraftType.None;
+        if (invenItemDictionary.TryGetValue(id, out InventoryItem foundItem))
+        {
+            returnVal = foundItem.craftType;
+        }
+
+        return returnVal;
+    }
+
+    // 해당 조합 결과물 아이템 타입의 조합 재료 갯수 반환
+    public int checkCraftAmount(CraftType type)
+    {
+        int returnVal = 0;
+        if (craftItemDictionary.TryGetValue(type, out InventoryItem foundItem))
+        {
+            if (foundItem.craftType == type)
+            {
+                returnVal = foundItem.numForCraft;
+            }
+        }
+
+        return returnVal;
+    }
     
 
     public bool checkStackability(int id)
     {
-        if(itemDictionary.TryGetValue(id, out InventoryItem foundItem))
+        bool returnVal = false;
+        if(invenItemDictionary.TryGetValue(id, out InventoryItem foundItem))
         {
-            return foundItem.stackable;
+            returnVal = foundItem.stackable;
         }
-        else
+
+        return returnVal;
+    }
+
+    public bool checkCraftability(int id)
+    {
+        bool returnVal = false;
+        if (allItemDictionary.TryGetValue(id, out InventoryItem foundItem))
         {
-            return false;
+            returnVal = foundItem.craftable;
         }
+
+        return returnVal;
     }
 
     public string checkEquipType(int id)
     {
+        string returnVal = "none";
         if (equipItemDictionary.TryGetValue(id, out InventoryItem foundItem))
         {
-            return foundItem.equipType.ToString();
+            returnVal = foundItem.equipType.ToString();
         }
-        else
-        {
-            return "none";
-        }
+
+        return returnVal;
     }
 
     public void showHoverWindow(int id, int slotId, bool equipable)
@@ -272,7 +430,7 @@ public class InventoryManager : MonoBehaviour
         // 기본 인벤토리 갯수에 이어서 장비란의 id 값이 정해졌으므로
         if (!equipable)
         {
-            if (itemDictionary.TryGetValue(id, out InventoryItem foundItem))
+            if (invenItemDictionary.TryGetValue(id, out InventoryItem foundItem))
             {
                 hoverTitleTxt.text = foundItem.itemName;
                 descriptionTxt.text = foundItem.description;
@@ -320,26 +478,15 @@ public class InventoryManager : MonoBehaviour
         {
             // 장비는 소모가 불가능하므로 소모 버튼 비활성화
             consumeBtn.SetActive(false);            
-            
-            // 장비는 조합이 불가능하므로 조합 버튼 비활성화
-            craftBtn.SetActive(false);
         }
         else
         {
             // 소모 가능 아이템인지 여부 확인 후 버튼 활/비활성화
-            if (itemDictionary.TryGetValue(clickedSlot.id, out foundItem))
+            if (invenItemDictionary.TryGetValue(clickedSlot.id, out foundItem))
             {
                 if (foundItem.consumable) { consumeBtn.SetActive(true); }
                 else { consumeBtn.SetActive(false); }
             }
-
-            // 조합 가능 아이템인지 여부 확인 후 버튼 활/비활성화
-            if (itemDictionary.TryGetValue(clickedSlot.id, out foundItem))
-            {
-                if (foundItem.craftable) { craftBtn.SetActive(true); }
-                else { craftBtn.SetActive(false); }
-            }
-
         }
 
         // 장비 슬롯이라면
@@ -380,6 +527,16 @@ public class InventoryManager : MonoBehaviour
             {
                 equipBtn.SetActive(false);
             }
+        }
+
+        // 조합 슬롯이라면
+        if (clickedSlot.isCraftSlot)
+        {
+            craftBtnTxt.text = "빼기";
+        }
+        else
+        {
+            craftBtnTxt.text = "조합";
         }
         
     }
@@ -487,6 +644,114 @@ public class InventoryManager : MonoBehaviour
         hideItemControlWindow();
     }
 
+    public void craftConfirmBtn()
+    {
+        bool isCraftable = false;
+        bool checkFull = true;
+        int count = 0;
+        CraftType targetType = CraftType.None;
+        int targetAmount = 0;
+        int targetID = 0;
+        int amount = 0;
+        List<InventorySlot> slot = new List<InventorySlot>();
+
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            if (inventorySlots[i].isEmpty)
+            {
+                checkFull = false;
+            }
+        }
+
+        // 인벤토리가 가득 차지 않아야 조합 버튼 클릭 가능
+        if (!checkFull)
+        {
+            for (int i = 0; i < craftSlots.Length; i++)
+            {
+                if (!craftSlots[i].isEmpty)
+                {
+                    count++;
+                    slot.Add(craftSlots[i]);
+                }
+            }
+
+            // 조합란에 아이템 2개 이상 있을 때
+            if (count > 1)
+            {
+                for (int i = 0; i < slot.Count; i++)
+                {
+                    // 조합란에 있는 아이템은 애초에 조합 가능한, craftable 아이템이어야 함
+                    if (checkCraftability(slot[i].id))
+                    {
+                        isCraftable = true;
+                        /* 첫 번째 비어 있지 않은 조합란의 CraftType을 타겟으로 지정, 
+                        * 해당 아이템에 필요한 재료의 갯수 가져옴 */
+                        if (i == 0)
+                        {
+                            targetType = checkCraftType(slot[i].id);
+                            targetID = checkCraftID(targetType);
+                            targetAmount = checkCraftAmount(targetType);
+                            Debug.Log(targetType.ToString());
+                            amount++;
+                            Debug.Log("필요한 재료 개수: " + targetAmount + "조합란 차 있는 수: " + count);
+                            // 애초에 예를 들어 3개 재료가 필요한데 count가 2라면 부족한 것이므로 조합 불가능
+                            if (count != targetAmount)
+                            {
+                                Debug.Log("ingredients are wrong, can't craft");
+                            }
+                        }
+                        else
+                        {
+                            // 나머지 조합란의 아이템에 같은 타입의 아이템이 있다면
+                            if (checkCraftType(slot[i].id) == targetType)
+                            {
+                                amount++;
+                            }
+                            // 아니라면 타겟 아이템에 필요한 재료가 아니므로 조합 불가능
+                            else
+                            {
+                                Debug.Log("ingredients are wrong, can't craft");
+                            }
+                        }
+                    }
+
+                    // 조합 불가능한 아이템이라면
+                    else
+                    {
+                        Debug.Log("the item is not ingredient");
+                        isCraftable = false;
+                        break;
+                    }
+                    
+                }
+
+                if (amount == targetAmount && isCraftable)
+                {
+                    // 조합 가능. 조합란의 아이템 다 비우고 조합된 아이템 빈 인벤토리 슬롯에 추가
+                    for (int i = 0; i < slot.Count; i++)
+                    {
+                        slot[i].resetSlot();
+                    }
+
+                    for (int i = 0; i < inventorySlots.Length; i++)
+                    {
+                        if (inventorySlots[i].isEmpty)
+                        {
+                            AddItem(returnInventoryItem(targetID));
+                            break;
+                        }
+                    }
+
+                }
+            }
+        }
+        else { Debug.Log("inventory is full, can't craft"); }
+            
+        
+    }
+
+
+    // 우클릭 창의 버튼
     public void DiscardBtn()
     {        
         buttonClick = true;
@@ -509,18 +774,44 @@ public class InventoryManager : MonoBehaviour
     public void SeperateBtn()
     {
         buttonClick = true;
-
-        // 1개보다 많을 경우 몇 개를 액션을 취해 줄것인지 결정
-        if (clickedSlot.amount > 1)
+        int countInventorySlot = 0;
+        bool emptyCraftSlot = true;
+        /* 만약 비어있는 슬롯이 1칸 밖에 없으면서 조합란이 모두 비어 있지 않으면 
+         * 나누기를 해서 빈 인벤토리란이 없을 때 인벤토리를 닫아 조합란의 아이템이 갈 곳을 잃는 경우를 막기 위해 확인*/
+        for (int i = 0; i < inventorySlots.Length; i++)
         {
-            for (int i = 0; i < inventorySlots.Length; i++) 
+            if (!inventorySlots[i].isEmpty)
+            {
+                countInventorySlot++;
+            }
+        }
+
+        for (int i = 0; i < craftSlots.Length; i++)
+        {
+            if (!craftSlots[i].isEmpty)
+            {
+                emptyCraftSlot = false;
+                break;
+            }
+        }
+
+        // 비어 있는 슬롯이 1개 밖에 없고 조합란이 비어 있지 않았다면
+        if (countInventorySlot == inventorySlots.Length - 1 && !emptyCraftSlot)
+        {
+            Debug.Log("empty craft slot first to seperate items, your inventory is almost full");
+        }
+        // 위의 경우가 아닌 보통의 경우
+        else
+        {
+            for (int i = 0; i < inventorySlots.Length; i++)
             {
                 InventorySlot slot = inventorySlots[i].GetComponent<InventorySlot>();
                 if (slot.isEmpty) { break; }
                 else if (i == inventorySlots.Length - 1) { Debug.Log("invetory is full, can't seperate the items!"); }
             }
             setItemControlWindow("나누기");
-        }
+
+        }    
 
         hideRightClickWindow();
     }
@@ -581,6 +872,28 @@ public class InventoryManager : MonoBehaviour
 
     public void CraftBtn()
     {
+        // 조합란에서 우클릭해서 빼기 버튼을 눌렀다면 해당 아이템을 다시 인벤토리함으로 옮겨야 함
+        if (clickedSlot.isCraftSlot)
+        {
+            CraftslotToInventory(clickedSlot);
+        }
+        else
+        {
+            // 조합란에 아이템을 넣어야 하므로 조합 컨테이너를 띄움
+            gameManager.uiManager.craftBtn();
+            for (int i = 0; i < craftSlots.Length; i++)
+            {
+                if (craftSlots[i].isEmpty)
+                {
+                    clickedSlot.IntoEmptySlot(craftSlots[i], clickedSlot.slotItem);
+                    break;
+                }
+                else if (i == craftSlots.Length - 1)
+                {
+                    Debug.Log("carft slot is full!");
+                }
+            }
+        }
 
         hideRightClickWindow();
     }

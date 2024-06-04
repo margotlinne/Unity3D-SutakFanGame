@@ -26,3 +26,5 @@ MonoBehaviour:
   craftable: 1
   stackable: 1
   equipable: 0
+  numForCraft: 0
+  craftType: 4

@@ -21,6 +21,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
     public int slotId;
     public bool isEquipSlot = false;
     public bool equipableInSlot = false;
+    public bool isCraftSlot = false;
     [HideInInspector] public ItemDragDrop slotItem;
 
 

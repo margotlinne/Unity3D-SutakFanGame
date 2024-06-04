@@ -17,7 +17,12 @@ public class InventoryItem : ScriptableObject
     public bool craftable;
     public bool stackable;
     public bool equipable;
+
+    public int numForCraft;
+    public CraftType craftType;
 }
 public enum PotionType { healthUp, damageUp, armourUp, evasionUp, criticalUp, None}
 public enum ItemType { Potion, Ingredient, Armor}
 public enum EquipType { cape, boots, sword, bow, None}
+
+public enum CraftType { healthUp, damageUp, armourUp, evasionUp, criticalUp, None}
