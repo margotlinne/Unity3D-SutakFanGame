@@ -46,7 +46,9 @@ public class InventoryManager : MonoBehaviour
     private bool buttonClick = false;
     public bool windowOn = false;
     public bool grappedItem = false;
-
+    private int availableCraftAmount = 0;
+    private int totalCraftAmount = 0;
+    private int craftItemID = 0;
 
 
     [HideInInspector]
@@ -267,7 +269,6 @@ public class InventoryManager : MonoBehaviour
             amountTxt.text = selectedAmount.ToString();
         }
 
-
         // 인벤토리 창이 사라졌을 때, 조합란에 있던 애들을 다시 인벤토리란으로 이동
         if (!gameManager.uiManager.inventoryCanvas.activeSelf)
         {
@@ -276,6 +277,7 @@ public class InventoryManager : MonoBehaviour
                 // 조합란이 비어 있지 않으면 
                 if (!craftSlots[i].isEmpty)
                 {
+                    Debug.Log("조합란에서 아이템란으로");
                     CraftslotToInventory(craftSlots[i]);
                 }
             }
@@ -603,9 +605,16 @@ public class InventoryManager : MonoBehaviour
                 selectedAmount++;
             }
         }
-        else
+        else if (titleTxt.text == "버리기")
         {
             if (selectedAmount < clickedSlot.amount)
+            {
+                selectedAmount++;
+            }
+        }
+        else if (titleTxt.text == "선택")
+        {
+            if (selectedAmount < availableCraftAmount)
             {
                 selectedAmount++;
             }
@@ -639,6 +648,11 @@ public class InventoryManager : MonoBehaviour
         {
             SeperateItems(selectedAmount);
         }
+        else if (titleTxt.text == "선택")
+        {
+            totalCraftAmount = selectedAmount;
+            craftingItems();          
+        }
 
         //setDataValues();
         hideItemControlWindow();
@@ -651,7 +665,6 @@ public class InventoryManager : MonoBehaviour
         int count = 0;
         CraftType targetType = CraftType.None;
         int targetAmount = 0;
-        int targetID = 0;
         int amount = 0;
         List<InventorySlot> slot = new List<InventorySlot>();
 
@@ -663,7 +676,7 @@ public class InventoryManager : MonoBehaviour
             }
         }
 
-        // 인벤토리가 가득 차지 않아야 조합 버튼 클릭 가능
+        // 인벤토리가 가득 차지 않았을 때 조합 가능
         if (!checkFull)
         {
             for (int i = 0; i < craftSlots.Length; i++)
@@ -689,7 +702,7 @@ public class InventoryManager : MonoBehaviour
                         if (i == 0)
                         {
                             targetType = checkCraftType(slot[i].id);
-                            targetID = checkCraftID(targetType);
+                            craftItemID = checkCraftID(targetType);
                             targetAmount = checkCraftAmount(targetType);
                             Debug.Log(targetType.ToString());
                             amount++;
@@ -725,33 +738,93 @@ public class InventoryManager : MonoBehaviour
                     
                 }
 
+                // 조합 가능
                 if (amount == targetAmount && isCraftable)
                 {
-                    // 조합 가능. 조합란의 아이템 다 비우고 조합된 아이템 빈 인벤토리 슬롯에 추가
+                    bool overTwo = false;
+
+                    // 조합란의 아이템이 두 개 이상일 경우에 몇 개 제작하고 싶은지 선택하도록
                     for (int i = 0; i < slot.Count; i++)
                     {
-                        slot[i].resetSlot();
-                    }
-
-                    for (int i = 0; i < inventorySlots.Length; i++)
-                    {
-                        if (inventorySlots[i].isEmpty)
+                        // 만약 조합란의 아이템이 2개 이상이라면 
+                        if (slot[i].amount > 1)
+                        {     
+                            // 가장 작은 값으로 설정
+                            if (availableCraftAmount == 0)
+                            {
+                                availableCraftAmount = slot[i].amount;
+                            }
+                            else if (slot[i].amount < availableCraftAmount)
+                            {
+                                availableCraftAmount = slot[i].amount;
+                            }
+                            // 모든 조합란의 아이템이 두 개 이상이라면
+                            if (i == slot.Count -1)
+                            {
+                                Debug.Log(availableCraftAmount);
+                                overTwo = true;
+                            }
+                        }
+                        else
                         {
-                            AddItem(returnInventoryItem(targetID));
                             break;
                         }
                     }
 
+                    // 조합란의 아이템이 두 개 이상이 아니라면 아이템이 1개 있던 조합란의 경우 슬롯 비우기
+                    if (!overTwo)
+                    {
+                        totalCraftAmount = 1;
+                        craftingItems();
+                    }
+                    // 조합란의 아이템이 두 개 이상이라면 몇 개 조합할 것인지 선택하도록
+                    else
+                    {
+                        // 선택 창에서 갯수 선택을 하고 나면 craftingItems 메서드에서 조합된 아이템 인벤토리에 추가 작업
+                        setItemControlWindow("선택");
+                    }                                   
                 }
             }
         }
-        else { Debug.Log("inventory is full, can't craft"); }
-            
-        
+        else { Debug.Log("inventory is full, can't craft"); }         
+    }
+
+    // totalCraftAmount 값만큼 조합템을 만들고 조합란 비우기
+    void craftingItems()
+    {
+        // 조합란 비우기, 수 조정하기
+        for (int i = 0; i < craftSlots.Length; ++i)
+        {
+            // 조합란의 아이템 갯수가 조합 하려는 아이템 갯수와 같으면 조합란 비우기
+            if (craftSlots[i].amount - totalCraftAmount == 0)
+            {
+                craftSlots[i].resetSlot();
+            }
+            else if (craftSlots[i].amount > 1)
+            {
+                craftSlots[i].amount -= totalCraftAmount;
+                craftSlots[i].slotItem.setParentData();
+            }
+        }
+        // 조합된 아이템 추가하기
+        for (int i = 0; i < inventorySlots.Length; i++)
+        {
+            if (inventorySlots[i].isEmpty)
+            {
+                for (int j = 0; j < totalCraftAmount; j++)
+                {
+                    AddItem(returnInventoryItem(craftItemID));
+                }
+                // 조합 후엔 해당 값 0으로 초기화
+                availableCraftAmount = 0;
+                totalCraftAmount = 0;
+                break;
+            }
+        }
     }
 
 
-    // 우클릭 창의 버튼
+    #region 우클릭 창 버튼들
     public void DiscardBtn()
     {        
         buttonClick = true;
@@ -897,4 +970,5 @@ public class InventoryManager : MonoBehaviour
 
         hideRightClickWindow();
     }
+    #endregion
 }
