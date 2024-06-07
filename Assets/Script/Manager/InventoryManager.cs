@@ -281,6 +281,9 @@ public class InventoryManager : MonoBehaviour
                     CraftslotToInventory(craftSlots[i]);
                 }
             }
+
+            closeRightClickWindow();
+            closeItemControlWindow();
         }
 
     }
@@ -451,7 +454,7 @@ public class InventoryManager : MonoBehaviour
         // Debug.Log(hoverId);
     }
 
-    public void hideHoverWindow()
+    public void closeHoverWindow()
     {
         hoverWindow.SetActive(false);
         hoverId = -1;
@@ -543,7 +546,7 @@ public class InventoryManager : MonoBehaviour
         
     }
     
-    void hideRightClickWindow()
+    void closeRightClickWindow()
     {
         rightClickWindow.SetActive(false);
         gameManager.uiManager.activeUI.Remove(rightClickWindow);
@@ -559,7 +562,7 @@ public class InventoryManager : MonoBehaviour
         gameManager.uiManager.activeUI.Add(itemControlWindow);
     }
 
-    void hideItemControlWindow()
+    void closeItemControlWindow()
     {
         itemControlWindow.SetActive(false);
         gameManager.uiManager.activeUI.Remove(itemControlWindow);
@@ -632,7 +635,7 @@ public class InventoryManager : MonoBehaviour
 
     public void cancelBtn()
     {
-        hideItemControlWindow();
+        closeItemControlWindow();
     }
 
     public void confirmBtn()
@@ -655,7 +658,7 @@ public class InventoryManager : MonoBehaviour
         }
 
         //setDataValues();
-        hideItemControlWindow();
+        closeItemControlWindow();
     }
 
     public void craftConfirmBtn()
@@ -840,7 +843,7 @@ public class InventoryManager : MonoBehaviour
             windowOn = false;
         }
 
-        hideRightClickWindow();
+        closeRightClickWindow();
 
     }
 
@@ -886,7 +889,7 @@ public class InventoryManager : MonoBehaviour
 
         }    
 
-        hideRightClickWindow();
+        closeRightClickWindow();
     }
 
     public void ConsumeBtn()
@@ -897,7 +900,7 @@ public class InventoryManager : MonoBehaviour
         if (clickedSlot.amount == 0) { clickedSlot.resetSlot(); }
         Debug.Log("drank potion");
 
-        hideRightClickWindow();            
+        closeRightClickWindow();            
         // 소모하고 나서 amount 값을 업데이트하기 위해 슬롯의 아이템 값을 부모 슬롯의 값으로 설정
         clickedSlot.slotItem.setParentData();
     }
@@ -939,7 +942,7 @@ public class InventoryManager : MonoBehaviour
             }
         }
 
-        hideRightClickWindow();
+        closeRightClickWindow();
         
     }
 
@@ -968,7 +971,7 @@ public class InventoryManager : MonoBehaviour
             }
         }
 
-        hideRightClickWindow();
+        closeRightClickWindow();
     }
     #endregion
 }

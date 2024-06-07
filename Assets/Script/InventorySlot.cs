@@ -104,7 +104,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
         // 현재 떠 있는 호버의 슬롯 아이디가 내 아이디일 때 즉 나의 호버 창이 떠 있을 때
         if (gameManager.inventoryManager.hoverId == slotId)
         {
-            gameManager.inventoryManager.hideHoverWindow();
+            gameManager.inventoryManager.closeHoverWindow();
         }
 
         if (wait != null)
