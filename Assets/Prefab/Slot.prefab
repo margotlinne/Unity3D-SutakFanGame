@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 5268679043130006256}
   - component: {fileID: 4677862910336202413}
   - component: {fileID: 8028445514902784815}
+  - component: {fileID: 5086644291267047506}
   - component: {fileID: 3635061405078057668}
   - component: {fileID: 6564933571706745937}
   - component: {fileID: 1276769821824561633}
@@ -80,6 +81,21 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!114 &5086644291267047506
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 216831388809730208}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_EffectColor: {r: 1, g: 0, b: 0, a: 1}
+  m_EffectDistance: {x: 5, y: 5}
+  m_UseGraphicAlpha: 1
 --- !u!114 &3635061405078057668
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -110,9 +126,13 @@ MonoBehaviour:
   itemImage: {fileID: 7275875571174818523}
   amountTxt: {fileID: 7170363486782409111}
   amount: 0
+  equipType: 
   isEmpty: 1
   id: 0
   slotId: 0
+  isEquipSlot: 0
+  equipableInSlot: 0
+  isCraftSlot: 0
   slotItem: {fileID: 4367120165579679610}
 --- !u!65 &1276769821824561633
 BoxCollider:
@@ -191,8 +211,8 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 1948608791162000902}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -502,8 +522,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   image: {fileID: 7275875571174818523}
   parentObj: {fileID: 6564933571706745937}
-  selectedEffectImage: {fileID: 0}
-  isDrag: 0
+  isEquipable: 0
+  isDragging: 0
   droppedItemID: 0
   droppedItemAmount: 0
   droppedItemImagePath: 
+  orgColor: {r: 0, g: 0, b: 0, a: 0}

@@ -12,14 +12,13 @@ public class ItemDragDrop : MonoBehaviour, IBeginDragHandler, IEndDragHandler, I
     
     GameManager gameManager;
     [HideInInspector] public bool isEquipable;
-    [HideInInspector] public bool isDrag;
+    [HideInInspector] public bool isDragging;
     [HideInInspector] public int droppedItemID;
     [HideInInspector] public int droppedItemAmount;
     [HideInInspector] public string droppedItemImagePath;
 
-    Color orgColor;
+    public Color orgColor;
     //[HideInInspector] public bool droppedItemEmpty;
-
     
 
     void Start()
@@ -52,12 +51,13 @@ public class ItemDragDrop : MonoBehaviour, IBeginDragHandler, IEndDragHandler, I
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        gameManager.inventoryManager.grappedItem = true;
+        gameManager.inventoryManager.draggedItem = this;
+        gameManager.inventoryManager.isGrappingItem = true;
         parentObj.GetComponent<Image>().color = Color.red;
         //Debug.Log(parentObj.amount);
 
         transform.SetParent(transform.root);
-        isDrag = true;
+        isDragging = true;
 
         // 아이템 드래그를 놓을 때 슬롯에 놓았는지 확인하기 위해 레이캐스트를 꺼두고 슬롯에 레이캐스트가 닿도록 
         image.raycastTarget = false;
@@ -72,11 +72,12 @@ public class ItemDragDrop : MonoBehaviour, IBeginDragHandler, IEndDragHandler, I
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        gameManager.inventoryManager.grappedItem = false;
+        gameManager.inventoryManager.draggedItem = null;
+        gameManager.inventoryManager.isGrappingItem = false;
         parentObj.GetComponent<Image>().color = orgColor;
 
         transform.SetParent(parentObj.gameObject.transform);
-        isDrag = false;
+        isDragging = false;
 
         // 아이템 드래그를 놓으면 레이캐스트를 켜서 다시 집을 수 있도록
         image.raycastTarget = true;

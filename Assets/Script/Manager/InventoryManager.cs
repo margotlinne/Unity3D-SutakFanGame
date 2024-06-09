@@ -7,6 +7,7 @@ using TMPro;
 using Unity.VisualScripting;
 using static UnityEditor.Progress;
 using UnityEngine.ProBuilder.MeshOperations;
+using UnityEngine.UI;
 
 public enum equipSlotType { cape, boots, sword, bow }
 
@@ -22,6 +23,8 @@ public class InventoryManager : MonoBehaviour
     public InventoryItem[] equipItems;
     public InventoryItem[] craftItems;
     public InventoryItem[] allItems;
+
+    public ItemDragDrop draggedItem; 
 
     private Dictionary<int, InventoryItem> invenItemDictionary;
     private Dictionary<int, InventoryItem> equipItemDictionary;
@@ -45,7 +48,7 @@ public class InventoryManager : MonoBehaviour
     private int selectedAmount = 0;
     private bool buttonClick = false;
     public bool windowOn = false;
-    public bool grappedItem = false;
+    public bool isGrappingItem = false;
     private int availableCraftAmount = 0;
     private int totalCraftAmount = 0;
     private int craftItemID = 0;
@@ -284,6 +287,27 @@ public class InventoryManager : MonoBehaviour
 
             closeRightClickWindow();
             closeItemControlWindow();
+        }
+
+
+        // 아이템이 드래그되기 시작했을 때, 또는 우클릭일 때
+        if ((isGrappingItem || rightClickWindow.activeSelf))
+        {
+            // 해당 아이템의 장비 타입에 맞는 장비 슬롯을 시각적으로 표시
+            for (int i = 0; i < equipSlots.Length; i++)
+            {
+                if (equipSlots[i].equipType == checkEquipType(draggedItem.droppedItemID).ToString())
+                {
+                    equipSlots[i].slotBox.GetComponent<Outline>().enabled = true;
+                }
+            }
+        }    
+        else 
+        {
+            for (int i = 0; i < equipSlots.Length; i++)
+            {
+                equipSlots[i].slotBox.GetComponent<Outline>().enabled = false;
+            }
         }
 
     }
