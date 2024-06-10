@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IUnitData
 {
     NavMeshAgent agent;
     ConvoManager convoManager;
@@ -16,7 +16,11 @@ public class Player : MonoBehaviour
     private bool collidedSomething;
     private bool moveFreely;
 
+    [HideInInspector] public int initiative;
+    public int Initiative => initiative;
 
+    public Sprite portrait;
+    public Sprite Portrait => portrait;
 
 
     void Awake()
@@ -38,6 +42,8 @@ public class Player : MonoBehaviour
         battleManager = gameManager.battleManager;
 
         moveFreely = true;
+
+        initiative = gameManager.dataManager.playerData.stat_initiative;
     }
 
     void FaceCamera()
@@ -216,6 +222,7 @@ public class Player : MonoBehaviour
             Debug.Log("fight!");
             arrivedDestination();
             battleManager.inBattle = true;
+            battleManager.units.Add(this.gameObject);
         }
 
         
