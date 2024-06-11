@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public interface IUnitData
 {
@@ -14,8 +15,15 @@ public class BattleManager : MonoBehaviour
     public bool clickedToMove = false;
     public bool inBattle = false;
 
+    public TextMeshProUGUI unitNameTxt;
+    public TextMeshProUGUI unitDamageTxt;
+    public TextMeshProUGUI unitResistanceTxt;
+    public TextMeshProUGUI unitInitiativeTxt;
+    public TextMeshProUGUI unitTraitTxt;
+
     public List<GameObject> units = new List<GameObject>();
 
+    public GameObject unitInfoWindow;
     public GameObject battleCanvas;
 
     void Update()
@@ -39,6 +47,14 @@ public class BattleManager : MonoBehaviour
                 });
             }
         }
+    }
+
+    public void showInfoWindow(string name, string damage, string initiative, string resistance, string trait)
+    {
+        unitInfoWindow.SetActive(true);
+        GameManager.instance.uiManager.activeUI.Add(unitInfoWindow);
+
+        unitInitiativeTxt.text = "¡÷µµ±«: " + initiative;
     }
 
     public void moveBtn()

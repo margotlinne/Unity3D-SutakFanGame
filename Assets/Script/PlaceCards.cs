@@ -30,6 +30,8 @@ public class PlaceCasrds : MonoBehaviour
                 GameObject newCard = Instantiate(portraitCard);
                 newCard.transform.SetParent(parent, false);
                 newCard.GetComponent<Image>().sprite = card.GetComponent<IUnitData>().Portrait;
+                PortraitCard _card = newCard.GetComponent<PortraitCard>();
+                _card.unitInitiative = card.GetComponent<IUnitData>().Initiative.ToString();
             }
             GameObject endCard = Instantiate(endOfTurn);
             endCard.transform.SetParent(parent, false);

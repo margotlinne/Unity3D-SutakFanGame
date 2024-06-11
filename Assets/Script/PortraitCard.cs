@@ -7,7 +7,18 @@ using UnityEngine.UI;
 public class PortraitCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
     public bool isHover = false;
+    public string unitName;
+    public string unitDamage;
+    public string unitResistance;
+    public string unitInitiative;
+    public string unitTrait;
 
+    GameManager gameManager;
+
+    void Start()
+    {
+        gameManager = GameManager.instance;
+    }
 
     void Update()
     {
@@ -19,6 +30,11 @@ public class PortraitCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             if (Input.GetMouseButtonDown(0))
             {
                 Debug.Log("clicked portrait card");
+            }
+            
+            if (Input.GetMouseButtonDown(1))
+            {
+                gameManager.battleManager.showInfoWindow("", "", unitInitiative, "", "");
             }
         }
         else
