@@ -28,10 +28,14 @@ public class PlaceCasrds : MonoBehaviour
             {
                 GameObject card = gameManager.battleManager.units[i];
                 GameObject newCard = Instantiate(portraitCard);
+
                 newCard.transform.SetParent(parent, false);
                 newCard.GetComponent<Image>().sprite = card.GetComponent<IUnitData>().Portrait;
+
                 PortraitCard _card = newCard.GetComponent<PortraitCard>();
                 _card.unitInitiative = card.GetComponent<IUnitData>().Initiative.ToString();
+                _card.id = card.GetComponent<IUnitData>().ID;
+                gameManager.battleManager.cards.Add(newCard.GetComponent<PortraitCard>());
             }
             GameObject endCard = Instantiate(endOfTurn);
             endCard.transform.SetParent(parent, false);

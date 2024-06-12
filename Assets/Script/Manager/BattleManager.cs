@@ -6,7 +6,10 @@ using TMPro;
 public interface IUnitData
 {
     int Initiative { get; }
+
     Sprite Portrait { get; }
+
+    int ID { get; }
 }
 
 public class BattleManager : MonoBehaviour
@@ -22,6 +25,7 @@ public class BattleManager : MonoBehaviour
     public TextMeshProUGUI unitTraitTxt;
 
     public List<GameObject> units = new List<GameObject>();
+    public List<PortraitCard> cards = new List<PortraitCard>();
 
     public GameObject unitInfoWindow;
     public GameObject battleCanvas;

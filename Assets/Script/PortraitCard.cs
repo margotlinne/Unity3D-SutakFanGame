@@ -6,7 +6,11 @@ using UnityEngine.UI;
 
 public class PortraitCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
 {
-    public bool isHover = false;
+    private bool isHover = false;
+
+    public bool hoverOnCharacter = false;
+
+    public int id = -1;
     public string unitName;
     public string unitDamage;
     public string unitResistance;
@@ -14,6 +18,14 @@ public class PortraitCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public string unitTrait;
 
     GameManager gameManager;
+    Outline outline;
+    Color outlineColor;
+
+    void Awake()
+    {
+        outline = GetComponent<Outline>();
+        outlineColor = outline.effectColor;
+    }
 
     void Start()
     {
@@ -24,7 +36,8 @@ public class PortraitCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     {
         if (isHover)
         {
-            GetComponent<Outline>().enabled = true;
+            outline.enabled = true;
+            outline.effectColor = outlineColor;
 
             // 더블 클릭으로?
             if (Input.GetMouseButtonDown(0))
@@ -37,11 +50,21 @@ public class PortraitCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
                 gameManager.battleManager.showInfoWindow("", "", unitInitiative, "", "");
             }
         }
-        else
+        else if (!isHover)
         {
-            GetComponent<Outline>().enabled = false;
+            if (hoverOnCharacter)
+            {
+                outline.enabled = true;
+                outline.effectColor = Color.black;
+            }
+            else
+            {
+                outline.enabled = false;
+            }
         }
     }
+
+   
 
     public void OnPointerEnter(PointerEventData eventData)
     {

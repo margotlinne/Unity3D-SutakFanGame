@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
 
 public class Player : MonoBehaviour, IUnitData
 {
@@ -12,7 +15,7 @@ public class Player : MonoBehaviour, IUnitData
     LineRenderer lr;
     Coroutine draw;
 
-
+    private bool isHover;
     private bool collidedSomething;
     private bool moveFreely;
 
@@ -21,6 +24,9 @@ public class Player : MonoBehaviour, IUnitData
 
     public Sprite portrait;
     public Sprite Portrait => portrait;
+
+    [HideInInspector] public int id;
+    public int ID => id;
 
 
     void Awake()
@@ -31,6 +37,8 @@ public class Player : MonoBehaviour, IUnitData
         lr.endWidth = 0.1f;
         lr.material.color = Color.white;
         lr.enabled = false;
+
+        id = 3;
 
         GetComponent<SpriteRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On;
     }
@@ -109,6 +117,36 @@ public class Player : MonoBehaviour, IUnitData
 
 
         //*************************************************** 전투 **********************************************************//
+
+
+        if (gameManager.battleManager.inBattle)
+        {
+            if (isHover)
+            {
+                for (int i = 0; i < gameManager.battleManager.cards.Count; i++)
+                {
+                    PortraitCard card = gameManager.battleManager.cards[i];
+                    if (card.id == id)
+                    {
+                        card.hoverOnCharacter = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 0; i < gameManager.battleManager.cards.Count; i++)
+                {
+                    PortraitCard card = gameManager.battleManager.cards[i];
+                    if (card.id == id)
+                    {
+                        card.hoverOnCharacter = false;
+                        break;
+                    }
+                }
+            }
+        }
+
 
         // 움직임 동작
         if (battleManager.toMove)
@@ -226,5 +264,15 @@ public class Player : MonoBehaviour, IUnitData
         }
 
         
+    }
+
+    public void OnMouseEnter()
+    {
+        isHover = true;
+    }
+
+    public void OnMouseExit()
+    {
+        isHover = false;
     }
 }
