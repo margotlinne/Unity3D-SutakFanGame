@@ -39,6 +39,18 @@ public class PortraitCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             outline.enabled = true;
             outline.effectColor = outlineColor;
 
+            // 아웃라인
+            for(int i =0; i < gameManager.battleManager.units.Count; i++)
+            {
+                GameObject unit = gameManager.battleManager.units[i];
+
+                if(unit.GetComponent<IUnitData>().ID == id)
+                {
+                    unit.GetComponent<IUnitData>().OutlineObj.SetActive(true);
+                    break;
+                }
+            }
+
             // 더블 클릭으로?
             if (Input.GetMouseButtonDown(0))
             {
@@ -60,6 +72,18 @@ public class PortraitCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             else
             {
                 outline.enabled = false;
+            }
+
+            // 아웃라인 감추기
+            for (int i = 0; i < gameManager.battleManager.units.Count; i++)
+            {
+                GameObject unit = gameManager.battleManager.units[i];
+
+                if (unit.GetComponent<IUnitData>().ID == id)
+                {
+                    unit.GetComponent<IUnitData>().OutlineObj.SetActive(false);
+                    break;
+                }
             }
         }
     }

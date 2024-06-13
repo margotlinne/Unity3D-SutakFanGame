@@ -10,6 +10,8 @@ public interface IUnitData
     Sprite Portrait { get; }
 
     int ID { get; }
+
+    GameObject OutlineObj { get; }
 }
 
 public class BattleManager : MonoBehaviour
@@ -65,6 +67,11 @@ public class BattleManager : MonoBehaviour
     {
         toMove = true;
         Debug.Log("clicked move button");
+    }
+
+    public void endTurnBtn()
+    {
+
     }
 
 

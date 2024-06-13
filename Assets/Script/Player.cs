@@ -28,6 +28,8 @@ public class Player : MonoBehaviour, IUnitData
     [HideInInspector] public int id;
     public int ID => id;
 
+    public GameObject outlineObj;
+    public GameObject OutlineObj => outlineObj;
 
     void Awake()
     {
