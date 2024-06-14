@@ -21,8 +21,11 @@ public class Enemy : MonoBehaviour, IUnitData
     public int ID => id;
 
     public GameObject outlineObj;
-    public GameObject OutlineObj => outlineObj;
 
+    public bool isInBattle;
+    public bool IsInBattle => isInBattle;
+
+    public BattleRange range;
 
     void Awake()
     {
@@ -38,8 +41,9 @@ public class Enemy : MonoBehaviour, IUnitData
 
     void Update()
     {
-        if (gameManager.battleManager.inBattle && !joinedBattle)
+        if (gameManager.battleManager.inBattle && range.playerEntered && !joinedBattle)
         {
+            isInBattle = true;
             gameManager.battleManager.units.Add(this.gameObject);
             joinedBattle = true;
         }
@@ -48,27 +52,17 @@ public class Enemy : MonoBehaviour, IUnitData
         {
             if (isHover)
             {
-                for (int i = 0; i < gameManager.battleManager.cards.Count; i++)
-                {
-                    PortraitCard card = gameManager.battleManager.cards[i];
-                    if (card.id == id)
-                    {
-                        card.hoverOnCharacter = true;
-                        break;
-                    }
-                }
+                gameManager.battleManager.idHoverOnCharacter = id;
+                outlineObj.SetActive(true);
             }
-            else
+            // 호버하고 있는 턴 카드가 자신을 가리키는 것이면 아웃라인 활성화
+            if (gameManager.battleManager.idHoverOnCard == id)
             {
-                for (int i = 0; i < gameManager.battleManager.cards.Count; i++)
-                {
-                    PortraitCard card = gameManager.battleManager.cards[i];
-                    if (card.id == id)
-                    {
-                        card.hoverOnCharacter = false;
-                        break;
-                    }
-                }
+                outlineObj.SetActive(true);
+            }
+            else if (!isHover)
+            {
+                outlineObj.SetActive(false);
             }
         }
     }
@@ -81,6 +75,8 @@ public class Enemy : MonoBehaviour, IUnitData
     public void OnMouseExit()
     {
         isHover = false;
+        gameManager.battleManager.idHoverOnCharacter = -1;
+        outlineObj.SetActive(false);
     }
 }
 

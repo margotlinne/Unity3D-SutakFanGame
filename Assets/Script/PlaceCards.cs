@@ -22,25 +22,70 @@ public class PlaceCasrds : MonoBehaviour
 
     void Update()
     {
-        if (gameManager.battleManager.inBattle && !generatedCards)
+        if (gameManager.battleManager.inBattle && !generatedCards && gameManager.battleManager.addedTurns)
         {
-            for (int i = 0; i < gameManager.battleManager.units.Count; i++)
-            {
-                GameObject card = gameManager.battleManager.units[i];
-                GameObject newCard = Instantiate(portraitCard);
-
-                newCard.transform.SetParent(parent, false);
-                newCard.GetComponent<Image>().sprite = card.GetComponent<IUnitData>().Portrait;
-
-                PortraitCard _card = newCard.GetComponent<PortraitCard>();
-                _card.unitInitiative = card.GetComponent<IUnitData>().Initiative.ToString();
-                _card.id = card.GetComponent<IUnitData>().ID;
-                gameManager.battleManager.cards.Add(newCard.GetComponent<PortraitCard>());
-            }
-            GameObject endCard = Instantiate(endOfTurn);
-            endCard.transform.SetParent(parent, false);
-
-            generatedCards = true;
+            placingCards();               
         }
+    }
+
+    void placingCards()
+    {
+        for (int i = 0; i < gameManager.battleManager.turns.Count; i++)
+        {
+
+            GameObject card = gameManager.battleManager.turns[i];
+            GameObject newCard = Instantiate(portraitCard);
+
+            newCard.transform.SetParent(parent, false);
+            newCard.GetComponent<Image>().sprite = card.GetComponent<IUnitData>().Portrait;
+
+            PortraitCard _card = newCard.GetComponent<PortraitCard>();
+            _card.unitInitiative = card.GetComponent<IUnitData>().Initiative.ToString();
+            _card.id = card.GetComponent<IUnitData>().ID;
+            gameManager.battleManager.cards.Add(newCard.GetComponent<PortraitCard>());
+
+            if (i >= gameManager.battleManager.turns.Count / 2)
+            {
+                newCard.GetComponent<Image>().color = Color.gray;
+            }
+
+        }
+        
+        for (int i = 0; i < 2; i++)
+        {
+            if (i == 0)
+            {
+                GameObject endCard = Instantiate(endOfTurn);
+                endCard.transform.SetParent(parent, false);
+                // 첫 번째 턴 갯수 후에 턴 마지막임을 뜻하는 오브젝트 추가
+                endCard.transform.SetSiblingIndex(gameManager.battleManager.units.Count);
+            }
+            else
+            {
+                GameObject endCard = Instantiate(endOfTurn);
+                endCard.transform.SetParent(parent, false);
+            }
+        }       
+        
+        generatedCards = true;
+    }
+
+    void addOneTurn()
+    {
+        for (int i = 0; i < gameManager.battleManager.units.Count; i++)
+        {
+            GameObject card = gameManager.battleManager.units[i];
+            GameObject newCard = Instantiate(portraitCard);
+
+            newCard.transform.SetParent(parent, false);
+            newCard.GetComponent<Image>().sprite = card.GetComponent<IUnitData>().Portrait;
+
+            PortraitCard _card = newCard.GetComponent<PortraitCard>();
+            _card.unitInitiative = card.GetComponent<IUnitData>().Initiative.ToString();
+            _card.id = card.GetComponent<IUnitData>().ID;
+            gameManager.battleManager.cards.Add(newCard.GetComponent<PortraitCard>());
+        }
+        GameObject endCard = Instantiate(endOfTurn);
+        endCard.transform.SetParent(parent, false);
     }
 }

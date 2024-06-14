@@ -29,7 +29,9 @@ public class Player : MonoBehaviour, IUnitData
     public int ID => id;
 
     public GameObject outlineObj;
-    public GameObject OutlineObj => outlineObj;
+
+    public bool isInBattle;
+    public bool IsInBattle => isInBattle;
 
     void Awake()
     {
@@ -125,27 +127,33 @@ public class Player : MonoBehaviour, IUnitData
         {
             if (isHover)
             {
-                for (int i = 0; i < gameManager.battleManager.cards.Count; i++)
-                {
-                    PortraitCard card = gameManager.battleManager.cards[i];
-                    if (card.id == id)
-                    {
-                        card.hoverOnCharacter = true;
-                        break;
-                    }
-                }
+                gameManager.battleManager.idHoverOnCharacter = id;
+                outlineObj.SetActive(true);
             }
-            else
+            
+
+            // 현재 턴 차례가 자신일 때
+            if (gameManager.battleManager.addedTurns)
             {
-                for (int i = 0; i < gameManager.battleManager.cards.Count; i++)
+                GameObject unit = gameManager.battleManager.turns[gameManager.battleManager.currentTurn];
+                if (unit.GetComponent<IUnitData>().ID == id)
                 {
-                    PortraitCard card = gameManager.battleManager.cards[i];
-                    if (card.id == id)
-                    {
-                        card.hoverOnCharacter = false;
-                        break;
-                    }
+                    gameManager.battleManager.showActionGroup();
                 }
+                else
+                {
+                    gameManager.battleManager.hideActionGroup();
+                }
+            }    
+            
+            // 호버하고 있는 턴 카드가 자신을 가리키는 것이면 아웃라인 활성화
+            if (gameManager.battleManager.idHoverOnCard == id)
+            {
+                outlineObj.SetActive(true);
+            }
+            else if (!isHover)
+            {
+                outlineObj.SetActive(false);
             }
         }
 
@@ -261,8 +269,9 @@ public class Player : MonoBehaviour, IUnitData
         {
             Debug.Log("fight!");
             arrivedDestination();
-            battleManager.inBattle = true;
-            battleManager.units.Add(this.gameObject);
+            isInBattle = true;
+            gameManager.battleManager.inBattle = true;
+            gameManager.battleManager.units.Add(this.gameObject);
         }
 
         
@@ -276,5 +285,7 @@ public class Player : MonoBehaviour, IUnitData
     public void OnMouseExit()
     {
         isHover = false;
+        gameManager.battleManager.idHoverOnCharacter = -1;
+        outlineObj.SetActive(false);
     }
 }
