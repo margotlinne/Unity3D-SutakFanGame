@@ -43,6 +43,8 @@ public class BattleManager : MonoBehaviour
 
     private bool setUnit = false;
 
+    public bool delayedTurn = false;
+
     GameManager gameManager;
 
     Coroutine wait;
@@ -96,7 +98,17 @@ public class BattleManager : MonoBehaviour
                 }
                 else
                 {
-                    cards[currentTurn].transform.localScale = new Vector3(1.2f, 1.2f, 1f);
+                    for (int i = 0; i < cards.Count; i++)
+                    {
+                        if (i == currentTurn)
+                        {
+                            cards[i].transform.localScale = new Vector3(1.2f, 1.2f, 1f);
+                        }
+                        else 
+                        {
+                            cards[i].transform.localScale = new Vector3(1f, 1f, 1f);
+                        }
+                    }
                 }
             }            
             
@@ -129,12 +141,30 @@ public class BattleManager : MonoBehaviour
 
     public void endTurnBtn()
     {
-
+        cards[currentTurn].gameObject.SetActive(false);
+        currentTurn++;
     }
 
     public void dealyTurnBtn()
     {
+        PortraitCard card = cards[currentTurn];
+        for (int i = 0; i < units.Count - 1; i++)
+        {
+            cards[i] = cards[i + 1];
+        }
+        cards[units.Count - 1] = card;
 
+
+        
+
+        GameObject turn = turns[currentTurn];
+        for (int i = 0; i < units.Count - 1; i++)
+        {
+            turns[i] = turns[i + 1];
+        }
+        turns[units.Count - 1] = turn;
+
+        delayedTurn = true;
     }
 
     IEnumerator WaitForSettingTurns()
