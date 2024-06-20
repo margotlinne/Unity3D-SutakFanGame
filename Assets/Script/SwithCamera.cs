@@ -11,6 +11,7 @@ public class SwithCamera : MonoBehaviour
 
     private int activeNum;
 
+
     void Awake()
     {
         cinemachineBrain = Camera.main.GetComponent<CinemachineBrain>();   
@@ -36,6 +37,10 @@ public class SwithCamera : MonoBehaviour
         {
             switchCam(KeyCode.O);
         }
+
+        ICinemachineCamera activeCam = cinemachineBrain.ActiveVirtualCamera;
+
+        activeCam.Follow = GameManager.instance.cameraTarget.transform;
     }
 
     void switchCam(KeyCode key)

@@ -43,16 +43,11 @@ public class PlaceCasrds : MonoBehaviour
             if (i < gameManager.battleManager.units.Count)
             {
                 card.transform.SetSiblingIndex(i);
-                Debug.Log(card);
-                Debug.Log(card.transform.GetSiblingIndex());
             }
             // 두 번째 턴 (턴 종료 표시 오브젝트는 가만 두기 위해)
             else
             {
-                Debug.Log("?");
                 card.transform.SetSiblingIndex(i + 1);
-                Debug.Log(card);
-                Debug.Log(card.transform.GetSiblingIndex());
             }
             
         }

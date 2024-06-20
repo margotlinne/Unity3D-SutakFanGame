@@ -64,6 +64,11 @@ public class Enemy : MonoBehaviour, IUnitData
             {
                 outlineObj.SetActive(false);
             }
+
+            if (gameManager.battleManager.idDoubleClick == id)
+            {
+                gameManager.cameraTarget = this.gameObject;
+            }
         }
     }
 

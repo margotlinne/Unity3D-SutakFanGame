@@ -56,6 +56,9 @@ public class Player : MonoBehaviour, IUnitData
         moveFreely = true;
 
         initiative = gameManager.dataManager.playerData.stat_initiative;
+
+
+        gameManager.cameraTarget = this.gameObject;
     }
 
     void FaceCamera()
@@ -154,6 +157,11 @@ public class Player : MonoBehaviour, IUnitData
             else if (!isHover)
             {
                 outlineObj.SetActive(false);
+            }
+
+            if (gameManager.battleManager.idDoubleClick == id)
+            {
+                gameManager.cameraTarget = this.gameObject;
             }
         }
 

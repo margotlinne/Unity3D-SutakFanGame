@@ -20,6 +20,12 @@ public class PortraitCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     Outline outline;
     Color outlineColor;
 
+    // 두 클릭 사이의 최대 허용 시간
+    public float doubleClickTime = 0.5f;
+
+    // 마지막 클릭이 발생한 시간
+    private float lastClickTime = 0f;
+
     void Awake()
     {
         outline = GetComponent<Outline>();
@@ -40,12 +46,23 @@ public class PortraitCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             gameManager.battleManager.idHoverOnCard = id;
 
 
-            // 더블 클릭으로?
+            // 마우스 왼쪽 버튼 클릭을 감지
             if (Input.GetMouseButtonDown(0))
             {
-                Debug.Log("clicked portrait card");
+                // 현재 시간
+                float timeSinceLastClick = Time.time - lastClickTime;
+
+                // 두 번째 클릭이 doubleClickTime 내에 발생했는지 확인
+                if (timeSinceLastClick <= doubleClickTime)
+                {
+                    // 더블클릭으로 간주
+                    OnDoubleClick();
+                }
+
+                // 마지막 클릭 시간 업데이트
+                lastClickTime = Time.time;
             }
-            
+
             if (Input.GetMouseButtonDown(1))
             {
                 gameManager.battleManager.showInfoWindow("", "", unitInitiative, "", "");
@@ -65,7 +82,10 @@ public class PortraitCard : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         }
     }
 
-   
+    void OnDoubleClick()
+    {
+        gameManager.battleManager.idDoubleClick = id;
+    }
 
     public void OnPointerEnter(PointerEventData eventData)
     {

@@ -20,6 +20,8 @@ public class GameManager : MonoBehaviour
     public bool getReward = false;
     public bool acceptedQuest = false;
 
+    public GameObject cameraTarget;
+
     void Awake()
     {
         #region singleton
@@ -28,5 +30,6 @@ public class GameManager : MonoBehaviour
         #endregion
     }
 
-    
+
+
 }

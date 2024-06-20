@@ -36,6 +36,7 @@ public class BattleManager : MonoBehaviour
 
     public int idHoverOnCard = -1;
     public int idHoverOnCharacter = -1;
+    public int idDoubleClick = -1;
 
     public int currentTurn = 0;
 
