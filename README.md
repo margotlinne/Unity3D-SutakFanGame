@@ -2,6 +2,9 @@
 
 ![screenshot](https://github.com/user-attachments/assets/9674deee-d645-4812-a7c9-b79ee3365bac)
 
+
+#### <a href="https://www.youtube.com/watch?v=f92nkF6nbvw&list=PLVgVcpUV3wTMd91EiLjE9PvgdMCfvKSws&index=13">▶️Play Video</a>
+
 ## About
 
 이 프로젝트는 인벤토리, 장비 착용, 턴제 전투, 대화 시스템, 능력치 분배, 저장 기능 등을 포괄하는 Unity 기반 RPG 게임 시스템 템플릿입니다.
@@ -131,5 +134,3 @@ Originally started in 2024 and paused, the project was resumed after completing 
 │   ├── SwithCamera.cs                 # 카메라 전환 기능
 │                                        Virtual camera switching via key input   
 ```
-
-#### <a href="https://www.youtube.com/watch?v=f92nkF6nbvw&list=PLVgVcpUV3wTMd91EiLjE9PvgdMCfvKSws&index=13">▶️Play Video</a>
