@@ -74,9 +74,9 @@ Originally started in 2024 and paused, the project was resumed after completing 
 📁 Scripts/
 ├── Core
 │   ├── GameManager.cs                  # 전역 상태 관리 (싱글톤)
-│                                         Global state controller (singleton)
+│   │                                     Global state controller (singleton)
 │   ├── DataManager.cs                  # 저장/불러오기 처리
-│                                         Save/load handler
+│   │                                      Save/load handler
 │   ├── UIManager.cs                    # UI 열기/닫기 및 ESC 처리
 │                                         UI stack and input handling
 │
@@ -92,7 +92,7 @@ Originally started in 2024 and paused, the project was resumed after completing 
 │   ├── ItemDragDrop.cs                 # 드래그 & 드롭 처리
 │   │                                     Drag and drop functionality
 │   ├── RightClickWindow.cs             # 우클릭 메뉴 UI
-│   │                                     Right-click UI menu
+│                                         Right-click UI menu
 │
 ├── FileSystem
 │   ├── InventoryData.cs                # 인벤토리 저장 데이터
