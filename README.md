@@ -131,3 +131,5 @@ Originally started in 2024 and paused, the project was resumed after completing 
 │   ├── SwithCamera.cs                 # 카메라 전환 기능
 │                                        Virtual camera switching via key input   
 ```
+
+#### <a href="https://www.youtube.com/watch?v=f92nkF6nbvw&list=PLVgVcpUV3wTMd91EiLjE9PvgdMCfvKSws&index=13">▶️Play Video</a>
