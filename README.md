@@ -7,20 +7,16 @@
 
 ## About
 
-이 프로젝트는 인벤토리, 장비 착용, 턴제 전투, 대화 시스템, 능력치 분배, 저장 기능 등을 포괄하는 Unity 기반 RPG 게임 시스템 템플릿입니다.
+이 프로젝트는 인벤토리, 장비 착용, 턴제 전투, 대화 시스템, 능력치 분배, 저장 기능 등을 포괄하는 Unity 기반 RPG 게임입니다.
 플레이어는 마우스 클릭을 통해 캐릭터를 조작하고, 아이템을 획득·소비·조합하거나, 적과 전투를 벌이고, NPC와의 대화를 통해 퀘스트를 진행하게 됩니다.
-
-이 시스템은 개인 개발자 또는 소규모 팀이 기초부터 RPG 게임을 구현하고 확장할 수 있도록 구조화되어 있으며, 실제 OS처럼 작동하는 UI 창 구조와 직관적인 인벤토리 조작 방식으로 게임 내 상호작용성을 높입니다.
 
 24년도에 시작 후 중단되었던 프로젝트로, 현재 취업 및 자격증 취득을 기점으로 리팩토링이 쉬운 구조화된 코드로 개선하기 위해서 다시 재개되었습니다.
 
 <br>
 
-This project is a Unity-based RPG game system template that includes a comprehensive range of systems such as inventory management, equipment handling, turn-based combat, dialogue interactions, stat allocation, and save/load features.
+This project is a Unity-based RPG game that includes a comprehensive range of systems such as inventory management, equipment handling, turn-based combat, dialogue interactions, stat allocation, and save/load features.
 
 Players control a character through mouse input to collect, consume, and craft items, engage in battles with enemies, and progress through quests by interacting with NPCs.
-
-Designed for solo developers or small teams, the system is modular and structured to serve as a foundation for building and expanding full-featured RPG games. It also features desktop-like UI windows and intuitive inventory handling for enhanced in-game interaction.
 
 Originally started in 2024 and paused, the project was resumed after completing job-related milestones and certifications, with a focus on refactoring and improving code structure for scalability and maintainability.
 
